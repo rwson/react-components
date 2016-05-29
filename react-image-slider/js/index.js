@@ -21,7 +21,10 @@ class App extends Component {
     render() {
         const slderConfig = {
             "autoPlay": true,
-            "interVal": 4000
+            "interVal": 4000,
+            "imgLists": [
+                1,2,3,4,5
+            ]
         };
         return (
             <div>

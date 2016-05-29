@@ -139,4 +139,20 @@ export default class Util {
         }
         return _res;
     }
+
+    /**
+     * 运行回调函数
+     * @param config    配置参数
+     */
+    runCallback(config) {
+        let defaults = {
+            "callback": () => {},
+            "context": {},
+            "argus": []
+        };
+        config = this.merge(defaults,config);
+        if(this.getProType(config.callback) == "function") {
+            config.callback.apply(config.context || window, config.argus);
+        }
+    }
 }

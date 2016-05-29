@@ -13,7 +13,7 @@ const defConfig = {
     "height": 300,                      //  高度
     "autoPlay": true,                   //  自动切换
     "interVal": 10000,                  //  自动切换时间
-    "imgLists": [],                     //  图片对象
+    "imgLists": [],                     //  图片数组
     "lazyLoad": true,                   //  懒加载
     "btnType": "number",                //  按钮类型(number/arrow)
     "btns": true,                       //  是否显示按钮
@@ -23,6 +23,9 @@ const defConfig = {
 
 //  定时器
 let interval = null;
+
+//  已经加载过的图片地址,防止后面继续加载
+let loaded = [];
 
 export default class Slider extends Component {
 
@@ -48,13 +51,56 @@ export default class Slider extends Component {
         });
     }
 
-
-    dealWithClass() {
-
+    /**
+     * 根据传入的下标进行切换
+     * @param number    切换到第几张图
+     */
+    ctrlChangeByNumber(number) {
+        const { config } = this.state;
+        Util.runCallback({
+            "callback": config.beforeChange
+        });
+        this.setState({
+            "currentIndex": number
+        });
+        Util.runCallback({
+            "callback": config.afterChange
+        });
     }
 
-    renderCtrlBtns() {
+    /**
+     * 切换到下一张
+     */
+    changeNext() {
+        const { config ,currentIndex } = this.state;
+        let index = currentIndex++;
+        if(index >= config.imgLists.length) {
+            index = 0;
+        }
+        this.setState({
+            "currentIndex": index
+        });
+    }
 
+    /**
+     * 控制按钮
+     * @returns {XML||null}
+     */
+    renderCtrlBtns() {
+        const { config } = this.state;
+        if(config.btns && !!config.imgLists) {
+            let btnArr = [];
+            for(let i = 0,len = config.imgLists.length; i < len; i ++) {
+                btnArr.push(`<span
+                                className="btn-item"
+                                onClick={this.ctrlChangeByNumber.bind(this,i)}>${i + 1}</span>`);
+            }
+            return (
+                <div className="btn-container btn-number">{btnArr}</div>
+            );
+        } else {
+            return null;
+        }
     }
 
     /**
