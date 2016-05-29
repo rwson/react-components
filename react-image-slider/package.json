@@ -38,6 +38,7 @@
     "gulp-webpack": "^1.5.0",
     "history": "^1.13.1",
     "jasmine-core": "^2.3.4",
+    "jsx-loader": "^0.13.2",
     "karma": "^0.13.15",
     "karma-chrome-launcher": "^0.2.1",
     "karma-cli": "^0.1.1",

@@ -1,12 +1,12 @@
-var path = __dirname;
+var prefPath = "./js/";
 var webpack = require("webpack");
 
 module.exports = {
     entry: [
-        path + "index.js"
+        prefPath + "index.js"
     ],
     output: {
-        path: path,
+        path : prefPath,
         filename: "bundle.js"
     },
     module: {
