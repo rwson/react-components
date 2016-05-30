@@ -29,7 +29,8 @@ class App extends Component {
                 "imgs/4.jpg",
                 "imgs/5.jpg"
             ],
-            "lazyLoad": false,
+            "lazyLoad": true,
+            "loading": "imgs/loading.gif",
             "beforeChange": () => {
                 console.log("要开始换啦...");
             },
