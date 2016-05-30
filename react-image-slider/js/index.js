@@ -9,8 +9,8 @@ import ReactDOM from "react-dom";
 
 import Slider from "./Slider";
 
-import "!css!less!../less/reset.less";
-import "!css!less!../less/index.less";
+import "../less/reset.less";
+import "../less/index.less";
 
 class App extends Component {
 
@@ -21,10 +21,21 @@ class App extends Component {
     render() {
         const slderConfig = {
             "autoPlay": true,
-            "interVal": 4000,
+            "interVal": 5000,
             "imgLists": [
-                1,2,3,4,5
-            ]
+                "imgs/1.jpg",
+                "imgs/2.jpg",
+                "imgs/3.jpg",
+                "imgs/4.jpg",
+                "imgs/5.jpg"
+            ],
+            "lazyLoad": false,
+            "beforeChange": () => {
+                console.log("要开始换啦...");
+            },
+            "afterChange": () => {
+                console.log("切换完啦...");
+            }
         };
         return (
             <div>

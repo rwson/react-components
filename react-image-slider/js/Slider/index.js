@@ -52,11 +52,24 @@ export default class Slider extends Component {
     }
 
     /**
+     * 组件被实例化完成
+     */
+    componentDidMount() {
+        const { config } = this.state;
+        interval = setInterval(() => {
+            this.changeNext();
+        }, config.interVal);
+    }
+
+    /**
      * 根据传入的下标进行切换
      * @param number    切换到第几张图
      */
     ctrlChangeByNumber(number) {
-        const { config } = this.state;
+        const { config, currentIndex } = this.state;
+        if(currentIndex == number) {
+            return;
+        }
         Util.runCallback({
             "callback": config.beforeChange
         });
@@ -73,34 +86,71 @@ export default class Slider extends Component {
      */
     changeNext() {
         const { config ,currentIndex } = this.state;
-        let index = currentIndex++;
+        let index = currentIndex + 1;
         if(index >= config.imgLists.length) {
             index = 0;
         }
-        this.setState({
-            "currentIndex": index
-        });
+        this.ctrlChangeByNumber(index);
     }
 
     /**
      * 控制按钮
-     * @returns {XML||null}
+     * @returns {XML|null}
      */
     renderCtrlBtns() {
-        const { config } = this.state;
-        if(config.btns && !!config.imgLists) {
+        const { config ,currentIndex } = this.state;
+        const len = config.imgLists.length;
+        const width = len * 30;
+        if(config.btns && len > 0) {
             let btnArr = [];
-            for(let i = 0,len = config.imgLists.length; i < len; i ++) {
-                btnArr.push(`<span
-                                className="btn-item"
-                                onClick={this.ctrlChangeByNumber.bind(this,i)}>${i + 1}</span>`);
+            for(let i = 0; i < len; i ++) {
+                let className = "btn-item";
+                if(i == currentIndex) {
+                    className += " current-btn";
+                }
+                btnArr.push((<i
+                    key={Util.random()}
+                    className={className}
+                    onClick={this.ctrlChangeByNumber.bind(this,i)}>{i + 1}</i>));
             }
             return (
-                <div className="btn-container btn-number">{btnArr}</div>
+                <div className="btn-container btn-number" style={{width: width,marginLeft: -width / 2}}>{btnArr}</div>
             );
         } else {
             return null;
         }
+    }
+
+    /**
+     * 渲染图片列表
+     * @returns {XML|null}
+     */
+    renderPicList() {
+        const { config,currentIndex } = this.state;
+        let imgArrs;
+        if(config.imgLists) {
+            imgArrs = config.imgLists.map((item, index)=> {
+                let className = "img-item";
+                if(index == currentIndex) {
+                    className += " pic-show";
+                } else {
+                    className += " pic-hide";
+                }
+                if(config.lazyLoad && loaded.indexOf(index) < 0) {
+                    return (
+                        <img className={className} key={Util.random()} lazy-src={item} />
+                    );
+                } else {
+                    return (
+                        <img className={className} key={Util.random()} src={item} />
+                    );
+                }
+            });
+        } else {
+            imgArrs = null;
+        }
+        return (<div className="img-container"
+                     style={{width: config.width,height: config.height}}>{imgArrs}</div>);
     }
 
     /**
@@ -110,6 +160,8 @@ export default class Slider extends Component {
     render() {
         return (
             <div className="slider-all">
+                {this.renderPicList()}
+                {this.renderCtrlBtns()}
             </div>
         );
     }

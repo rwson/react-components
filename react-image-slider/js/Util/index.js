@@ -60,7 +60,7 @@ export default class Util {
      * @returns {string}
      */
     static random() {
-        return ("" + (+new Date()) + Math.random() * 9999).toString(16).replace(/\./g, "");
+        return (Math.random() * 9999).toString(16).replace(/\./g, "");
     }
 
     /**
@@ -144,7 +144,7 @@ export default class Util {
      * 运行回调函数
      * @param config    配置参数
      */
-    runCallback(config) {
+    static runCallback(config) {
         let defaults = {
             "callback": () => {},
             "context": {},
