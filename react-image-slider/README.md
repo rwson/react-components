@@ -1,6 +1,6 @@
 # react-image-slider
 
-图片滑动组件
+图片切换组件
 
 ---
 

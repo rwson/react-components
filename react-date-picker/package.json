@@ -1,0 +1,59 @@
+{
+  "name": "react-date-picker",
+  "version": "1.0.0",
+  "description": "react date picker",
+  "main": "index.html",
+  "scripts": {
+    "webpackWatch": "webpack --watch",
+    "buildProduction": "webpack -p --define process.env.NODE_ENV='\"production\"' --progress --color"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rwson/my-react-components/react-date-picker"
+  },
+  "keywords": [
+    "react",
+    "ES6"
+  ],
+  "author": "rwson",
+  "license": "ISC",
+  "dependencies": {
+    "babel": "^6.0.15",
+    "babel-core": "^5.8.23",
+    "babel-loader": "^5.3.2",
+    "babel-polyfill": "^6.3.14",
+    "classnames": "^2.1.3",
+    "css-loader": "0.17.0",
+    "extend": "^3.0.0",
+    "extract-text-webpack-plugin": "^0.8.2",
+    "file-loader": "^0.8.5",
+    "glob": "^5.0.14",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^5.3.0",
+    "gulp-karma": "0.0.5",
+    "gulp-less": "^3.0.3",
+    "gulp-load-plugins": "^1.0.0-rc.1",
+    "gulp-open": "^1.0.0",
+    "gulp-util": "^3.0.6",
+    "gulp-webpack": "^1.5.0",
+    "history": "^1.13.1",
+    "jasmine-core": "^2.3.4",
+    "jsx-loader": "^0.13.2",
+    "karma": "^0.13.15",
+    "karma-chrome-launcher": "^0.2.1",
+    "karma-cli": "^0.1.1",
+    "karma-jasmine": "^0.3.6",
+    "karma-webpack": "^1.7.0",
+    "less-loader": "^2.2.0",
+    "raw-loader": "^0.5.1",
+    "react": "^0.14.5",
+    "react-dom": "^15.1.0",
+    "react-hot-loader": "^1.3.0",
+    "react-router": "^1.0.2",
+    "style-loader": "^0.12.3",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.12.1",
+    "webpack-bower-resolver": "0.0.1",
+    "webpack-dev-server": "^1.14.0"
+  }
+}

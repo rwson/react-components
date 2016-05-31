@@ -56,6 +56,32 @@ export default class Util {
     }
 
     /**
+     * 判断是否闰年
+     * @param date  日期对象(不传默认判断当前年份)
+     * @returns {boolean}
+     */
+    static isLeapYear(date) {
+        const finalDate = date instanceof Date ? date : new Date();
+        const year = finalDate.getFullYear();
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    }
+
+    /**
+     * 获取指定年月1号是星期几
+     * @param year      年份
+     * @param month     月份
+     * @returns {number}[1-6]
+     */
+    static getMonthFristDay(year,month) {
+        if(year && month){
+            return (new Date(year,month,1)).getDay();
+        } else {
+            const dateObject = new Date();
+            return (new Date(dateObject.getFullYear(),date.getMonth(),1)).getDay();
+        }
+    }
+
+    /**
      * 获取一个随机字符串
      * @returns {string}
      */
