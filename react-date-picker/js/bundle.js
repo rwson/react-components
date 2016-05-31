@@ -19867,28 +19867,20 @@
 	        key: "changeDate",
 	        value: function changeDate(date, type) {
 	            if (type == "prev-month") {} else if (type == "next-month") {} else {}
+	            this.calculatorInfo();
 	        }
 
 	        /**
 	         * 月份改变
+	         * @param month 目标月份
 	         */
 	    }, {
 	        key: "changeMonth",
-	        value: function changeMonth() {}
+	        value: function changeMonth(month) {
+	            var current = this.state.current;
 
-	        /**
-	         * 上一月按钮
-	         */
-	    }, {
-	        key: "prevMonth",
-	        value: function prevMonth() {}
-
-	        /**
-	         * 下一月按钮
-	         */
-	    }, {
-	        key: "nextMonth",
-	        value: function nextMonth() {}
+	            this.calculatorInfo();
+	        }
 
 	        /**
 	         * 年份发生改变
@@ -19896,7 +19888,78 @@
 	         */
 	    }, {
 	        key: "changeYear",
-	        value: function changeYear(year) {}
+	        value: function changeYear(year) {
+	            var current = this.state.current;
+
+	            this.setState({
+	                "current": (0, _objectAssign2["default"])({}, current, { "year": year })
+	            });
+	            this.calculatorInfo();
+	        }
+
+	        /**
+	         * 上一月按钮
+	         */
+	    }, {
+	        key: "prevMonth",
+	        value: function prevMonth() {
+	            var current = this.state.current;
+
+	            var month = current.month - 1 < 0 ? 11 : current.month - 1;
+	            this.setState({
+	                "current": (0, _objectAssign2["default"])({}, current, { "month": month }),
+	                "date": new Date(current.year, month, current.date)
+	            });
+	            this.calculatorInfo();
+	        }
+
+	        /**
+	         * 下一月按钮
+	         */
+	    }, {
+	        key: "nextMonth",
+	        value: function nextMonth() {
+	            var current = this.state.current;
+
+	            var month = current.month + 1 > 11 ? 0 : current.month - 0;
+	            this.setState({
+	                "current": (0, _objectAssign2["default"])({}, current, { "month": month }),
+	                "date": new Date(current.year, month, current.date)
+	            });
+	            this.calculatorInfo();
+	        }
+
+	        /**
+	         * 上一年按钮
+	         */
+	    }, {
+	        key: "prevYear",
+	        value: function prevYear() {
+	            var current = this.state.current;
+
+	            var year = current.year - 1;
+	            this.setState({
+	                "current": (0, _objectAssign2["default"])({}, current, { "year": year }),
+	                "date": new Date(year, current.month, current.date)
+	            });
+	            this.calculatorInfo();
+	        }
+
+	        /**
+	         * 下一年按钮
+	         */
+	    }, {
+	        key: "nextYear",
+	        value: function nextYear() {
+	            var current = this.state.current;
+
+	            var year = current.year + 1;
+	            this.setState({
+	                "current": (0, _objectAssign2["default"])({}, current, { "year": year }),
+	                "date": new Date(year, current.month, current.date)
+	            });
+	            this.calculatorInfo();
+	        }
 
 	        /**
 	         * 计算日历相关信息
@@ -20051,6 +20114,7 @@
 	            var config = _state2.config;
 	            var date = _state2.date;
 
+	            console.log(date);
 	            var targetDate = _Util2["default"].convertTime(date, "YYYY-MM-dd");
 	            return _react2["default"].createElement(
 	                "div",
@@ -20063,12 +20127,12 @@
 	                        { className: "left-btns" },
 	                        _react2["default"].createElement(
 	                            "i",
-	                            { className: "prevYear" },
+	                            { className: "prevYear", onClick: this.prevYear.bind(this) },
 	                            "<<"
 	                        ),
 	                        _react2["default"].createElement(
 	                            "i",
-	                            { className: "prevMonth" },
+	                            { className: "prevMonth", onClick: this.prevMonth.bind(this) },
 	                            "<"
 	                        )
 	                    ),
@@ -20097,19 +20161,19 @@
 	                        { className: "right-btns" },
 	                        _react2["default"].createElement(
 	                            "i",
-	                            { className: "prevYear" },
-	                            ">>"
+	                            { className: "nextMonth", onClick: this.nextMonth.bind(this) },
+	                            ">"
 	                        ),
 	                        _react2["default"].createElement(
 	                            "i",
-	                            { className: "prevMonth" },
-	                            ">"
+	                            { className: "nextYear", onClick: this.nextYear.bind(this) },
+	                            ">>"
 	                        )
 	                    )
 	                ),
 	                _react2["default"].createElement(
 	                    "div",
-	                    { className: "weeks" },
+	                    { className: "weeks", style: { display: config.showLevel == "day" ? "block" : "none" } },
 	                    _react2["default"].createElement(
 	                        "span",
 	                        { className: "week-num" },
@@ -20156,6 +20220,8 @@
 	    }, {
 	        key: "renderYear",
 	        value: function renderYear() {
+	            var _this = this;
+
 	            var _state3 = this.state;
 	            var renderData = _state3.renderData;
 	            var config = _state3.config;
@@ -20163,13 +20229,13 @@
 	            var years = renderData.years.map(function (item) {
 	                return _react2["default"].createElement(
 	                    "span",
-	                    { key: item.id, className: "year-item " + (0, _classnames2["default"])({
+	                    { key: item.id,
+	                        onClick: _this.changeYear.bind(_this, item.num),
+	                        className: "year-item " + (0, _classnames2["default"])({
 	                            "current": item.current,
 	                            "active": item.active
 	                        }) },
-	                    " ",
-	                    item.text,
-	                    " "
+	                    item.text
 	                );
 	            });
 	            return _react2["default"].createElement(
@@ -20186,6 +20252,8 @@
 	    }, {
 	        key: "renderMonth",
 	        value: function renderMonth() {
+	            var _this2 = this;
+
 	            var _state4 = this.state;
 	            var renderData = _state4.renderData;
 	            var config = _state4.config;
@@ -20193,13 +20261,13 @@
 	            var months = renderData.months.map(function (item) {
 	                return _react2["default"].createElement(
 	                    "span",
-	                    { key: item.id, className: "month-item " + (0, _classnames2["default"])({
+	                    { key: item.id,
+	                        onClick: _this2.changeMonth.bind(_this2, item.num),
+	                        className: "month-item " + (0, _classnames2["default"])({
 	                            "current": item.current,
 	                            "active": item.active
 	                        }) },
-	                    " ",
-	                    item.text,
-	                    " "
+	                    item.text
 	                );
 	            });
 	            return _react2["default"].createElement(

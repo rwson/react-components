@@ -107,24 +107,16 @@ export default class DatePicker extends Component {
         } else {
 
         }
+        this.calculatorInfo();
     }
 
     /**
      * 月份改变
+     * @param month 目标月份
      */
-    changeMonth() {
-    }
-
-    /**
-     * 上一月按钮
-     */
-    prevMonth() {
-    }
-
-    /**
-     * 下一月按钮
-     */
-    nextMonth() {
+    changeMonth(month) {
+        const { current } = this.state;
+        this.calculatorInfo();
     }
 
     /**
@@ -132,6 +124,63 @@ export default class DatePicker extends Component {
      * @param year  选中的年份
      */
     changeYear(year) {
+        const { current } = this.state;
+        this.setState({
+            "current": objectAssign({}, current, {"year": year})
+        });
+        this.calculatorInfo();
+    }
+
+    /**
+     * 上一月按钮
+     */
+    prevMonth() {
+        const { current } = this.state;
+        let month = current.month - 1 < 0 ? 11 : current.month - 1;
+        this.setState({
+            "current": objectAssign({}, current, {"month": month}),
+            "date": new Date(current.year, month, current.date)
+        });
+        this.calculatorInfo();
+    }
+
+    /**
+     * 下一月按钮
+     */
+    nextMonth() {
+        const { current } = this.state;
+        let month = current.month + 1 > 11 ? 0 : current.month - 0;
+        this.setState({
+            "current": objectAssign({}, current, {"month": month}),
+            "date": new Date(current.year, month, current.date)
+        });
+        this.calculatorInfo();
+    }
+
+    /**
+     * 上一年按钮
+     */
+    prevYear() {
+        const { current } = this.state;
+        let year = current.year - 1;
+        this.setState({
+            "current": objectAssign({}, current, {"year": year}),
+            "date": new Date(year, current.month, current.date)
+        });
+        this.calculatorInfo();
+    }
+
+    /**
+     * 下一年按钮
+     */
+    nextYear() {
+        const { current } = this.state;
+        let year = current.year + 1;
+        this.setState({
+            "current": objectAssign({}, current, {"year": year}),
+            "date": new Date(year, current.month, current.date)
+        });
+        this.calculatorInfo();
     }
 
     /**
@@ -276,13 +325,14 @@ export default class DatePicker extends Component {
      */
     renderTop() {
         const { config, date } = this.state;
+        console.log(date);
         const targetDate = Util.convertTime(date, "YYYY-MM-dd");
         return (
             <div className="top-area">
                 <div className="btn-area">
                     <div className="left-btns">
-                        <i className="prevYear">&lt;&lt;</i>
-                        <i className="prevMonth">&lt;</i>
+                        <i className="prevYear" onClick={this.prevYear.bind(this)}>&lt;&lt;</i>
+                        <i className="prevMonth" onClick={this.prevMonth.bind(this)}>&lt;</i>
                     </div>
                     <div className="center-info"
                          style={{display: config.showLevel == "year" ? "block" : "none"}}>
@@ -299,11 +349,11 @@ export default class DatePicker extends Component {
                         { targetDate }
                     </div>
                     <div className="right-btns">
-                        <i className="prevYear">&gt;&gt;</i>
-                        <i className="prevMonth">&gt;</i>
+                        <i className="nextMonth" onClick={this.nextMonth.bind(this)}>&gt;</i>
+                        <i className="nextYear" onClick={this.nextYear.bind(this)}>&gt;&gt;</i>
                     </div>
                 </div>
-                <div className="weeks">
+                <div className="weeks" style={{display: config.showLevel == "day" ? "block" : "none"}}>
                     <span className="week-num">周日</span>
                     <span className="week-num">周一</span>
                     <span className="week-num">周二</span>
@@ -324,10 +374,14 @@ export default class DatePicker extends Component {
         const { renderData, config } = this.state;
         let years = renderData.years.map((item) => {
             return (
-                <span key={item.id} className={`year-item ${classnames({
-                    "current": item.current,
-                    "active": item.active
-                })}`}> {item.text} </span>
+                <span key={item.id}
+                      onClick={this.changeYear.bind(this,item.num)}
+                      className={`year-item ${classnames({
+                        "current": item.current,
+                        "active": item.active
+                      })}`}>
+                    { item.text }
+                </span>
             );
         });
         return (
@@ -345,10 +399,14 @@ export default class DatePicker extends Component {
         const { renderData, config } = this.state;
         let months = renderData.months.map((item) => {
             return (
-                <span key={ item.id } className={`month-item ${ classnames({
-                    "current": item.current,
-                    "active": item.active
-                })}`}> { item.text } </span>
+                <span key={ item.id }
+                      onClick={this.changeMonth.bind(this,item.num)}
+                      className={`month-item ${ classnames({
+                        "current": item.current,
+                        "active": item.active
+                      })}`}>
+                        { item.text }
+                </span>
             );
         });
         return (
