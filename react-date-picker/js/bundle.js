@@ -95,10 +95,11 @@
 	    _createClass(App, [{
 	        key: "render",
 	        value: function render() {
+	            var config = {};
 	            return _react2["default"].createElement(
 	                "div",
 	                null,
-	                _react2["default"].createElement(_DatePicker2["default"], null)
+	                _react2["default"].createElement(_DatePicker2["default"], { config: config })
 	            );
 	        }
 	    }]);
@@ -19753,6 +19754,10 @@
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
+	var _objectAssign = __webpack_require__(174);
+
+	var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
 	var _Util = __webpack_require__(161);
 
 	var _Util2 = _interopRequireDefault(_Util);
@@ -19761,9 +19766,9 @@
 	var defConfig = {
 	    "format": "YYYY-MM-dd HH:mm:ss", //  输出的时间格式
 	    "initDate": "now", //  初始化时间格式
-	    "showLevel": "day", //  显示级别(day:日|month:月)
+	    "showLevel": "day", //  显示级别(day:日|month:月|year:年)
 	    "maxDate": "2100-01-01",
-	    "minDate": "2100-01-01",
+	    "minDate": "2000-01-01",
 	    "change": function change() {},
 	    "close": function close() {}
 	};
@@ -19798,9 +19803,8 @@
 	        };
 	        this.state = {
 	            "monthDays": monthDays,
-	            "showLevel": "date",
-	            "storedDate": dateInfo,
 	            "date": date,
+	            "storedDate": dateInfo,
 	            "current": dateInfo,
 	            "renderData": {
 	                "years": [],
@@ -19818,17 +19822,52 @@
 	    _createClass(DatePicker, [{
 	        key: "componentWillMount",
 	        value: function componentWillMount() {
-	            this.setState();
+	            var config = this.props.config;
+
+	            this.setState({
+	                "config": _Util2["default"].merge(defConfig, config || {})
+	            });
 	            this.calculatorInfo();
 	        }
 
 	        /**
-	         * 日期改变
-	         * @param date
+	         * 点击顶部显示区域,改变显示层级
+	         * @param level     层级(day:日|month:月|year:年)
+	         */
+	    }, {
+	        key: "changeShowLevel",
+	        value: function changeShowLevel(level) {
+	            var config = this.props.config;
+
+	            this.setState({
+	                "config": (0, _objectAssign2["default"])({}, config, { "showLevel": level })
+	            });
+	        }
+
+	        /**
+	         * 显示今天
+	         */
+	    }, {
+	        key: "showToday",
+	        value: function showToday() {
+	            var config = this.props.config;
+
+	            this.setState({
+	                "current": this.state.storedDate,
+	                "config": (0, _objectAssign2["default"])({}, config, { "showLevel": "day" })
+	            });
+	        }
+
+	        /**
+	         * 点击具体的日期发生改变
+	         * @param date  日期
+	         * @param type  类型
 	         */
 	    }, {
 	        key: "changeDate",
-	        value: function changeDate(date) {}
+	        value: function changeDate(date, type) {
+	            if (type == "prev-month") {} else if (type == "next-month") {} else {}
+	        }
 
 	        /**
 	         * 月份改变
@@ -19869,27 +19908,71 @@
 	            var current = _state.current;
 	            var storedDate = _state.storedDate;
 	            var renderData = _state.renderData;
+	            var config = _state.config;
 
-	            /**
-	             * 计算年份 start
-	             */
-
-	            /**
-	             * 计算年份 end
-	             */
-
-	            /**
-	             * 计算月中的天数 start
-	             */
 	            var getInfos = {
 	                "prevYear": current.year, //  上月对应的年
 	                "nextYear": current.year, //  下月对应的年
 	                "prevMonth": current.month - 1, //  上月对应的月
 	                "nextMonth": current.month + 1 //  下月对应的月
 	            };
+	            var curYear = current.year; //  当前年
+	            var minDate = new Date(config.minDate); //  最小日期
+	            var maxDate = new Date(config.maxDate); //  最大日期
 	            var daysInfo = {}; //  每月的第一天的相关信息
+	            var renderDataYears = []; //  用来渲染月的数组
+	            var renderDataMonths = []; //  用来渲染月的数组
 	            var renderDataDays = []; //  用来渲染天的数组
+	            var startYear = curYear - 7; //  开始年份
+	            var endYear = curYear + 7; //  结束年份
 
+	            /**
+	             * 计算年份 start
+	             */
+	            //  传入了一个有效的最小日期
+	            if (!isNaN(Date.parse(minDate))) {
+	                var minYear = minDate.getFullYear();
+	                startYear = startYear < minYear ? minYear : startYear;
+	            }
+
+	            //  传入了一个有效的最大日期
+	            if (!isNaN(Date.parse(maxDate))) {
+	                var maxYear = maxDate.getFullYear();
+	                endYear = endYear > maxYear ? maxYear : endYear;
+	            }
+
+	            for (var year = startYear; year <= endYear; year++) {
+	                renderDataYears.push({
+	                    "text": year,
+	                    "num": year,
+	                    "current": year == storedDate.year,
+	                    "active": false,
+	                    "id": _Util2["default"].random()
+	                });
+	            }
+	            /**
+	             * 计算年份 end
+	             */
+
+	            /**
+	             * 计算月份 start
+	             */
+	            renderDataMonths = monthNames.map(function (item, index) {
+	                return {
+	                    "text": item,
+	                    "num": index,
+	                    "current": current.year == storedDate.year && index == storedDate.month,
+	                    "active": false,
+	                    "id": _Util2["default"].random()
+	                };
+	            });
+	            /**
+	             * 计算月份 end
+	             */
+
+	            /**
+	             * 计算月中的天数 start
+	             */
 	            //  去年的情况
 	            if (getInfos.prevMonth < 0) {
 	                getInfos.prevMonth = 11;
@@ -19926,10 +20009,10 @@
 	            for (var i = 1, days = monthDays[current.month]; i <= days; i++) {
 	                renderDataDays.push({
 	                    "num": i,
-	                    "today": current.year == storedDate.year && current.month == storedDate.month && i == storedDate.day,
+	                    "today": current.year == storedDate.year && current.month == storedDate.month && i == storedDate.date,
 	                    "active": false,
 	                    "id": _Util2["default"].random(),
-	                    "type": "prev-month"
+	                    "type": "current-month"
 	                });
 	            }
 
@@ -19945,14 +20028,16 @@
 	                    });
 	                }
 	            }
-
-	            renderData.days = renderDataDays;
 	            /**
 	             * 计算月中的天数 end
 	             */
 
 	            this.setState({
-	                "renderData": renderData
+	                "renderData": (0, _objectAssign2["default"])({}, renderData, {
+	                    "years": renderDataYears,
+	                    "months": renderDataMonths,
+	                    "days": renderDataDays
+	                })
 	            });
 	        }
 
@@ -19962,8 +20047,11 @@
 	    }, {
 	        key: "renderTop",
 	        value: function renderTop() {
-	            var date = this.state.date;
+	            var _state2 = this.state;
+	            var config = _state2.config;
+	            var date = _state2.date;
 
+	            var targetDate = _Util2["default"].convertTime(date, "YYYY-MM-dd");
 	            return _react2["default"].createElement(
 	                "div",
 	                { className: "top-area" },
@@ -19986,8 +20074,23 @@
 	                    ),
 	                    _react2["default"].createElement(
 	                        "div",
-	                        { className: "center-info" },
-	                        _Util2["default"].convertTime(date, "YYYY-MM-dd")
+	                        { className: "center-info",
+	                            style: { display: config.showLevel == "year" ? "block" : "none" } },
+	                        targetDate
+	                    ),
+	                    _react2["default"].createElement(
+	                        "div",
+	                        { className: "center-info",
+	                            onClick: this.changeShowLevel.bind(this, "year"),
+	                            style: { display: config.showLevel == "month" ? "block" : "none" } },
+	                        targetDate
+	                    ),
+	                    _react2["default"].createElement(
+	                        "div",
+	                        { className: "center-info",
+	                            onClick: this.changeShowLevel.bind(this, "month"),
+	                            style: { display: config.showLevel == "day" ? "block" : "none" } },
+	                        targetDate
 	                    ),
 	                    _react2["default"].createElement(
 	                        "div",
@@ -20052,7 +20155,29 @@
 	         */
 	    }, {
 	        key: "renderYear",
-	        value: function renderYear() {}
+	        value: function renderYear() {
+	            var _state3 = this.state;
+	            var renderData = _state3.renderData;
+	            var config = _state3.config;
+
+	            var years = renderData.years.map(function (item) {
+	                return _react2["default"].createElement(
+	                    "span",
+	                    { key: item.id, className: "year-item " + (0, _classnames2["default"])({
+	                            "current": item.current,
+	                            "active": item.active
+	                        }) },
+	                    " ",
+	                    item.text,
+	                    " "
+	                );
+	            });
+	            return _react2["default"].createElement(
+	                "div",
+	                { className: "years-container", style: { display: config.showLevel == "year" ? "block" : "none" } },
+	                years
+	            );
+	        }
 
 	        /**
 	         * 渲染月份布局
@@ -20060,7 +20185,29 @@
 	         */
 	    }, {
 	        key: "renderMonth",
-	        value: function renderMonth() {}
+	        value: function renderMonth() {
+	            var _state4 = this.state;
+	            var renderData = _state4.renderData;
+	            var config = _state4.config;
+
+	            var months = renderData.months.map(function (item) {
+	                return _react2["default"].createElement(
+	                    "span",
+	                    { key: item.id, className: "month-item " + (0, _classnames2["default"])({
+	                            "current": item.current,
+	                            "active": item.active
+	                        }) },
+	                    " ",
+	                    item.text,
+	                    " "
+	                );
+	            });
+	            return _react2["default"].createElement(
+	                "div",
+	                { className: "months-container", style: { display: config.showLevel == "month" ? "block" : "none" } },
+	                months
+	            );
+	        }
 
 	        /**
 	         * 渲染日期布局
@@ -20069,11 +20216,11 @@
 	    }, {
 	        key: "renderDate",
 	        value: function renderDate() {
-	            var renderData = this.state.renderData;
+	            var _state5 = this.state;
+	            var renderData = _state5.renderData;
+	            var config = _state5.config;
 
-	            var returnArr = []; //  返回的标签数组
-
-	            returnArr = renderData.days.map(function (item) {
+	            var days = renderData.days.map(function (item) {
 	                return _react2["default"].createElement(
 	                    "span",
 	                    { key: item.id, className: "day-item " + item.type + " " + (0, _classnames2["default"])({
@@ -20088,8 +20235,8 @@
 
 	            return _react2["default"].createElement(
 	                "div",
-	                { className: "days-container" },
-	                returnArr
+	                { className: "days-container", style: { display: config.showLevel == "day" ? "block" : "none" } },
+	                days
 	            );
 	        }
 
@@ -20628,7 +20775,7 @@
 
 
 	// module
-	exports.push([module.id, ".date-picker-all {\n  width: 290px;\n  background: #fff;\n  border-radius: 10px;\n  border: 1px solid #ccc;\n}\n.btn-area {\n  width: 100%;\n  overflow: hidden;\n  line-height: 30px;\n  text-align: center;\n}\n.btn-area > div {\n  float: left;\n}\n.btn-area .left-btns,\n.btn-area .right-btns {\n  width: 70px;\n  text-align: center;\n}\n.btn-area .left-btns i,\n.btn-area .right-btns i {\n  display: inline-block;\n  float: left;\n  width: 25px;\n  height: 25px;\n  line-height: 25px;\n  text-align: center;\n  border: 1px solid #ccc;\n  border-radius: 5px;\n  margin: 3px;\n}\n.btn-area .center-info {\n  width: 150px;\n  font-size: 16px;\n}\n.weeks {\n  padding: 0 5px;\n}\n.weeks .week-num {\n  display: inline-block;\n  width: 40px;\n  font-size: 12px;\n  text-align: center;\n}\n.days-container {\n  padding: 5px;\n}\n.days-container .day-item {\n  display: inline-block;\n  width: 40px;\n  height: 30px;\n  text-align: center;\n  line-height: 30px;\n  color: #000;\n  transition: all 0.5s;\n  cursor: default;\n}\n.days-container .day-item:hover,\n.days-container .day-item.active {\n  background: #555;\n  color: #fff;\n  border-radius: 5px;\n}\n", ""]);
+	exports.push([module.id, ".date-picker-all {\n  width: 290px;\n  background: #fff;\n  border-radius: 10px;\n  border: 1px solid #ccc;\n}\n.btn-area {\n  width: 100%;\n  overflow: hidden;\n  line-height: 30px;\n  text-align: center;\n}\n.btn-area > div {\n  float: left;\n}\n.btn-area .left-btns,\n.btn-area .right-btns {\n  width: 70px;\n  text-align: center;\n}\n.btn-area .left-btns i,\n.btn-area .right-btns i {\n  display: inline-block;\n  float: left;\n  width: 25px;\n  height: 25px;\n  cursor: default;\n  line-height: 25px;\n  text-align: center;\n  border: 1px solid #ccc;\n  border-radius: 5px;\n  margin: 3px;\n}\n.btn-area .center-info {\n  width: 150px;\n  font-size: 16px;\n  cursor: default;\n}\n.weeks {\n  padding: 0 5px;\n}\n.weeks .week-num {\n  display: inline-block;\n  width: 40px;\n  font-size: 12px;\n  text-align: center;\n}\n.days-container {\n  padding: 5px;\n}\n.months-container {\n  padding: 5px 10px;\n}\n.years-container {\n  padding: 5px 10px;\n}\n.years-container .year-item {\n  display: inline-block;\n  width: 52px;\n  height: 40px;\n  text-align: center;\n  line-height: 40px;\n  color: #000;\n  transition: all 0.5s;\n  cursor: default;\n  border-radius: 5px;\n  margin: 1px;\n}\n.months-container .month-item {\n  display: inline-block;\n  width: 62px;\n  height: 40px;\n  text-align: center;\n  line-height: 40px;\n  color: #000;\n  transition: all 0.5s;\n  cursor: default;\n  border-radius: 5px;\n  margin: 1px;\n}\n.days-container .day-item {\n  display: inline-block;\n  width: 38px;\n  height: 30px;\n  text-align: center;\n  line-height: 30px;\n  color: #000;\n  transition: all 0.5s;\n  cursor: default;\n  border-radius: 5px;\n  margin: 1px;\n}\n.years-container .year-item:hover,\n.years-container .year-item.active,\n.days-container .day-item:hover,\n.days-container .day-item.active {\n  background: #555;\n  color: #fff;\n}\n.prev-month,\n.next-month {\n  background: #f2f2f2;\n}\n", ""]);
 
 	// exports
 
@@ -20782,6 +20929,94 @@
 			window.classNames = classNames;
 		}
 	})();
+
+/***/ },
+/* 173 */,
+/* 174 */
+/***/ function(module, exports) {
+
+	'use strict';
+	/* eslint-disable no-unused-vars */
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
+	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+	function toObject(val) {
+		if (val === null || val === undefined) {
+			throw new TypeError('Object.assign cannot be called with null or undefined');
+		}
+
+		return Object(val);
+	}
+
+	function shouldUseNative() {
+		try {
+			if (!Object.assign) {
+				return false;
+			}
+
+			// Detect buggy property enumeration order in older V8 versions.
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+			var test1 = new String('abc'); // eslint-disable-line
+			test1[5] = 'de';
+			if (Object.getOwnPropertyNames(test1)[0] === '5') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test2 = {};
+			for (var i = 0; i < 10; i++) {
+				test2['_' + String.fromCharCode(i)] = i;
+			}
+			var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+				return test2[n];
+			});
+			if (order2.join('') !== '0123456789') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test3 = {};
+			'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+				test3[letter] = letter;
+			});
+			if (Object.keys(Object.assign({}, test3)).join('') !== 'abcdefghijklmnopqrst') {
+				return false;
+			}
+
+			return true;
+		} catch (e) {
+			// We don't expect any of the above to throw, but better to be safe.
+			return false;
+		}
+	}
+
+	module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+		var from;
+		var to = toObject(target);
+		var symbols;
+
+		for (var s = 1; s < arguments.length; s++) {
+			from = Object(arguments[s]);
+
+			for (var key in from) {
+				if (hasOwnProperty.call(from, key)) {
+					to[key] = from[key];
+				}
+			}
+
+			if (Object.getOwnPropertySymbols) {
+				symbols = Object.getOwnPropertySymbols(from);
+				for (var i = 0; i < symbols.length; i++) {
+					if (propIsEnumerable.call(from, symbols[i])) {
+						to[symbols[i]] = from[symbols[i]];
+					}
+				}
+			}
+		}
+
+		return to;
+	};
 
 /***/ }
 /******/ ]);

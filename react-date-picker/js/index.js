@@ -19,9 +19,10 @@ class App extends Component {
     }
 
     render() {
+        const config = {};
         return (
             <div>
-                <DatePicker />
+                <DatePicker config={ config } />
             </div>
         );
     }

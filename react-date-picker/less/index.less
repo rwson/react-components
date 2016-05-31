@@ -1,74 +1,119 @@
 .date-picker-all {
-    width: 290px;
-    background: #fff;
-    border-radius: 10px;
-    border: 1px solid #ccc;
+  width: 290px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #ccc;
 }
 
 .btn-area {
-    width: 100%;
-    overflow: hidden;
-    line-height: 30px;
-    text-align: center;
+  width: 100%;
+  overflow: hidden;
+  line-height: 30px;
+  text-align: center;
 }
 
 .btn-area > div {
-    float: left;
+  float: left;
 }
 
 .btn-area .left-btns,
 .btn-area .right-btns {
-    width: 70px;
-    text-align: center;
+  width: 70px;
+  text-align: center;
 }
 
 .btn-area .left-btns i,
 .btn-area .right-btns i {
-    display: inline-block;
-    float: left;
-    width: 25px;
-    height: 25px;
-    line-height: 25px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin: 3px;
+  display: inline-block;
+  float: left;
+  width: 25px;
+  height: 25px;
+  cursor: default;
+  line-height: 25px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin: 3px;
 }
 
 .btn-area .center-info {
-    width: 150px;
-    font-size: 16px;
+  width: 150px;
+  font-size: 16px;
+  cursor: default;
 }
 
 .weeks {
-    padding: 0 5px;
+  padding: 0 5px;
 }
 
 .weeks .week-num {
-    display: inline-block;
-    width: 40px;
-    font-size: 12px;
-    text-align: center;
+  display: inline-block;
+  width: 40px;
+  font-size: 12px;
+  text-align: center;
 }
 
 .days-container {
-    padding: 5px;
+  padding: 5px;
+}
+
+.months-container {
+  padding: 5px 10px;
+}
+
+.years-container {
+  padding: 5px 10px;
+}
+
+.years-container .year-item {
+  display: inline-block;
+  width: 52px;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  color: #000;
+  transition: all 0.5s;
+  cursor: default;
+  border-radius: 5px;
+  margin: 1px;
+}
+
+.months-container .month-item {
+  display: inline-block;
+  width: 62px;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  color: #000;
+  transition: all 0.5s;
+  cursor: default;
+  border-radius: 5px;
+  margin: 1px;
 }
 
 .days-container .day-item {
-    display: inline-block;
-    width: 40px;
-    height: 30px;
-    text-align: center;
-    line-height: 30px;
-    color: #000;
-    transition: all 0.5s;
-    cursor: default;
+  display: inline-block;
+  width: 38px;
+  height: 30px;
+  text-align: center;
+  line-height: 30px;
+  color: #000;
+  transition: all 0.5s;
+  cursor: default;
+  border-radius: 5px;
+  margin: 1px;
 }
 
+.years-container .year-item:hover,
+.years-container .year-item.active,
 .days-container .day-item:hover,
 .days-container .day-item.active {
-    background: #555;
-    color: #fff;
-    border-radius: 5px;
+  background: #555;
+  color: #fff;
 }
+
+.prev-month, .next-month {
+  background: #f2f2f2;
+}
+
+

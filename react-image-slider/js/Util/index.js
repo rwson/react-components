@@ -43,13 +43,15 @@ export default class Util {
      */
     static merge(obj, obj2, override) {
         let res = obj;
-        //  遍历第二个对象
-        for (var i in obj2) {
-            //  支持重写,且原对象存在该属性值
-            if (override && !!res[i]) {
-                res[i] = obj2[i];
-            } else {
-                res[i] = obj2[i];
+        //  遍历第二个对象(非空)
+        if(!this.isEmpty(obj2)){
+            for (var i in obj2) {
+                //  支持重写,且原对象存在该属性值
+                if (override && !!res[i]) {
+                    res[i] = obj2[i];
+                } else {
+                    res[i] = obj2[i];
+                }
             }
         }
         return res;
