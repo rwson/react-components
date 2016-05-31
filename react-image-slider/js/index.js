@@ -9,8 +9,8 @@ import ReactDOM from "react-dom";
 
 import Slider from "./Slider";
 
-import "../less/reset.less";
-import "../less/index.less";
+import "!style!css!less!../less/reset.less";
+import "!style!css!less!../less/index.less";
 
 class App extends Component {
 

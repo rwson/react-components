@@ -70,14 +70,15 @@ export default class Util {
      * 获取指定年月1号是星期几
      * @param year      年份
      * @param month     月份
-     * @returns {number}[1-6]
+     * @param day       具体的日期
+     * @returns {number}[0-6]
      */
-    static getMonthFristDay(year,month) {
-        if(year && month){
-            return (new Date(year,month,1)).getDay();
+    static getMonthFristDay(year, month, day) {
+        if (year && month) {
+            return (new Date(year, month, 1)).getDay();
         } else {
             const dateObject = new Date();
-            return (new Date(dateObject.getFullYear(),date.getMonth(),1)).getDay();
+            return (new Date(dateObject.getFullYear(), date.getMonth(), day || 1)).getDay();
         }
     }
 
@@ -172,12 +173,13 @@ export default class Util {
      */
     static runCallback(config) {
         let defaults = {
-            "callback": () => {},
+            "callback": () => {
+            },
             "context": {},
             "argus": []
         };
-        config = this.merge(defaults,config);
-        if(this.getProType(config.callback) == "function") {
+        config = this.merge(defaults, config);
+        if (this.getProType(config.callback) == "function") {
             config.callback.apply(config.context || window, config.argus);
         }
     }
