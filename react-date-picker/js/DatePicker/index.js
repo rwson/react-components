@@ -10,17 +10,20 @@ import objectAssign from "object-assign";
 
 import Util from "../Util";
 
+import "!style!css!less!../../less/reset.less";
+import "!style!css!less!../../less/index.less";
+
 //  默认配置
 const defConfig = {
     "format": "YYYY-MM-dd HH:mm:ss",        //  输出的时间格式
-    "initDate": "now",                      //  初始化时间格式
+    "initDate": "now",                      //  初始化时间(now||"":当前|时间字符串)
     "showLevel": "day",                     //  显示级别(day:日|month:月|year:年)
     "maxDate": "2100-01-01",                //  最大日期
     "minDate": "2000-01-01",                //  最小日期
     "change": () => {
-    },                  //  选择的日期发生改变
+    },                  //  选择的日期发生改变回调
     "close": () => {
-    }                    //  关闭
+    }                    //  关闭回调
 };
 
 //  月份天数
@@ -68,8 +71,9 @@ export default class DatePicker extends Component {
         const { config } = this.props;
         this.setState({
             "config": Util.merge(defConfig, config || {})
+        }, () => {
+            this.calculatorInfo();
         });
-        this.calculatorInfo();
     }
 
     /**
@@ -91,6 +95,14 @@ export default class DatePicker extends Component {
         this.setState({
             "current": this.state.storedDate,
             "config": objectAssign({}, config, {"showLevel": "day"})
+        }, () => {
+            Util.runCallback(config.change,{
+                "argus": {
+                    "current": target,
+                    "result": Util.convertTime(target,config.format)
+                }
+            });
+            this.calculatorInfo();
         });
     }
 
@@ -100,11 +112,39 @@ export default class DatePicker extends Component {
      * @param type  类型
      */
     changeDate(date, type) {
+        let { current } = this.state;
+        let year = current.year;
+        let month = current.month;
         if (type == "prev-month") {
+            month -= 1;
+            if (month < 0) {
+                year -= 1;
+                month = 11;
+            }
         } else if (type == "next-month") {
-        } else {
+            month += 1;
+            if (month > 11) {
+                year += 1;
+                month = 0;
+            }
         }
-        this.calculatorInfo();
+        let target = new Date(year, month, date);
+        this.setState({
+            "current": objectAssign({}, current, {
+                "month": target.getMonth(),
+                "year": target.getFullYear(),
+                "date": date
+            }),
+            "date": target
+        }, () => {
+            Util.runCallback(config.change,{
+                "argus": {
+                    "current": target,
+                    "result": Util.convertTime(target,config.format)
+                }
+            });
+            this.calculatorInfo();
+        });
     }
 
     /**
@@ -112,8 +152,26 @@ export default class DatePicker extends Component {
      * @param month 目标月份
      */
     changeMonth(month) {
-        const { current } = this.state;
-        this.calculatorInfo();
+        let { current, config } = this.state;
+        let year = current.year;
+        let target = new Date(year, month, 1);
+        this.setState({
+            "current": objectAssign({}, current, {
+                "month": month,
+                "year": target.getFullYear(),
+                "date": 1
+            }),
+            "date": target,
+            "config": objectAssign({}, config,{"showLevel": "day"})
+        }, () => {
+            Util.runCallback(config.change,{
+                "argus": {
+                    "current": target,
+                    "result": Util.convertTime(target,config.format)
+                }
+            });
+            this.calculatorInfo();
+        });
     }
 
     /**
@@ -121,10 +179,24 @@ export default class DatePicker extends Component {
      * @param year  选中的年份
      */
     changeYear(year) {
-        const { current } = this.state;
+        let { current, config } = this.state;
+        let month = current.month;
+        let target = new Date(year, month, 1);
         this.setState({
-            "current": objectAssign({}, current, {"year": year})
+            "current": objectAssign({}, current, {
+                "month": month,
+                "year": year,
+                "date": 1
+            }),
+            "date": target,
+            "config": objectAssign({}, config,{"showLevel": "month"})
         }, () => {
+            Util.runCallback(config.change,{
+                "argus": {
+                    "current": target,
+                    "result": Util.convertTime(target,config.format)
+                }
+            });
             this.calculatorInfo();
         });
     }
@@ -141,14 +213,19 @@ export default class DatePicker extends Component {
             year -= 1;
         }
         let target = new Date(year, month, 1);
-        current = objectAssign({}, current, {
-            "month": target.getMonth(),
-            "year": target.getFullYear()
-        });
         this.setState({
-            "current": current,
+            "current": objectAssign({}, current, {
+                "month": target.getMonth(),
+                "year": target.getFullYear()
+            }),
             "date": target
         }, () => {
+            Util.runCallback(config.change,{
+                "argus": {
+                    "current": target,
+                    "result": Util.convertTime(target,config.format)
+                }
+            });
             this.calculatorInfo();
         });
     }
@@ -157,7 +234,7 @@ export default class DatePicker extends Component {
      * 下一月按钮
      */
     nextMonth() {
-        let { current } = this.state;
+        let { current, config } = this.state;
         let month = current.month + 1;
         let year = current.year;
         if (month > 11) {
@@ -165,14 +242,19 @@ export default class DatePicker extends Component {
             year += 1;
         }
         let target = new Date(year, month, 1);
-        current = objectAssign({}, current, {
-            "month": target.getMonth(),
-            "year": target.getFullYear()
-        });
         this.setState({
-            "current": current,
+            "current": objectAssign({}, current, {
+                "month": target.getMonth(),
+                "year": target.getFullYear()
+            }),
             "date": target
         }, () => {
+            Util.runCallback(config.change,{
+                "argus": {
+                    "current": target,
+                    "result": Util.convertTime(target,config.format)
+                }
+            });
             this.calculatorInfo();
         });
     }
@@ -192,6 +274,12 @@ export default class DatePicker extends Component {
             "current": objectAssign({}, current, {"year": year}),
             "date": new Date(year, current.month, 1)
         }, () => {
+            Util.runCallback(config.change,{
+                "argus": {
+                    "current": target,
+                    "result": Util.convertTime(target,config.format)
+                }
+            });
             this.calculatorInfo();
         });
     }
@@ -211,6 +299,12 @@ export default class DatePicker extends Component {
             "current": objectAssign({}, current, {"year": year}),
             "date": target
         }, () => {
+            Util.runCallback(config.change,{
+                "argus": {
+                    "current": target,
+                    "result": Util.convertTime(target,config.format)
+                }
+            });
             this.calculatorInfo();
         });
     }
@@ -219,13 +313,18 @@ export default class DatePicker extends Component {
      * 计算日历相关信息
      */
     calculatorInfo() {
-        const { current, storedDate, renderData, config } = this.state;
+        const { current, storedDate, date, renderData, config } = this.state;
         let getInfos = {
             "prevYear": current.year,           //  上月对应的年
             "nextYear": current.year,           //  下月对应的年
             "prevMonth": current.month - 1,     //  上月对应的月
             "nextMonth": current.month + 1      //  下月对应的月
         };
+        let activeObj = {
+            "year": date.getFullYear(),
+            "month": date.getMonth(),
+            "date": date.getDate()
+        };                                      //  判断active
         let curYear = current.year;             //  当前年
         let minDate = new Date(config.minDate); //  最小日期
         let maxDate = new Date(config.maxDate); //  最大日期
@@ -256,7 +355,7 @@ export default class DatePicker extends Component {
                 "text": year,
                 "num": year,
                 "current": year == storedDate.year,
-                "active": false,
+                "active": year == activeObj.year,
                 "id": Util.random()
             });
         }
@@ -272,7 +371,7 @@ export default class DatePicker extends Component {
                 "text": item,
                 "num": index,
                 "current": (current.year == storedDate.year) && index == storedDate.month,
-                "active": false,
+                "active": index == activeObj.month,
                 "id": Util.random()
             };
         });
@@ -320,7 +419,7 @@ export default class DatePicker extends Component {
             renderDataDays.push({
                 "num": i,
                 "today": (current.year == storedDate.year) && (current.month == storedDate.month) && (i == storedDate.date),
-                "active": false,
+                "active": (current.year == date.year) && (current.month == date.month) && (i == date.date),
                 "id": Util.random(),
                 "type": "current-month"
             });
@@ -454,10 +553,12 @@ export default class DatePicker extends Component {
         const { renderData, config } = this.state;
         let days = renderData.days.map((item) => {
             return (
-                <span key={ item.id } className={`day-item ${item.type} ${ classnames({
-                    "today": item.today,
-                    "active": item.active
-                })}`}> { item.num } </span>
+                <span key={ item.id }
+                      onClick={ this.changeDate.bind(this, item.num, item.type) }
+                      className={`day-item ${item.type} ${ classnames({
+                            "today": item.today,
+                            "active": item.active
+                        })}`}> { item.num } </span>
             );
         });
 
@@ -487,7 +588,7 @@ export default class DatePicker extends Component {
      * 组件被销毁
      */
     componentWillUnmount() {
-
+        this.state = {};
     }
 
 }

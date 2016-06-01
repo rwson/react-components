@@ -9,9 +9,6 @@ import ReactDOM from "react-dom";
 
 import DatePicker from "./DatePicker";
 
-import "!style!css!less!../less/reset.less";
-import "!style!css!less!../less/index.less";
-
 class App extends Component {
 
     constructor(props) {
@@ -19,7 +16,17 @@ class App extends Component {
     }
 
     render() {
-        const config = {};
+        const config = {
+            "format": "YYYY-MM-dd HH:mm:ss",
+            "initDate": "now",
+            "showLevel": "day",
+            "maxDate": "2100-01-01",
+            "minDate": "2000-01-01",
+            "change": () => {
+            },
+            "close": () => {
+            }
+        };
         return (
             <div>
                 <DatePicker config={ config } />

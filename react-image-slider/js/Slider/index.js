@@ -7,6 +7,9 @@
 import Util from "../Util";
 import React,{ Component } from "react";
 
+import "!style!css!less!../../less/reset.less";
+import "!style!css!less!../../less/index.less";
+
 //  默认配置
 const defConfig = {
     "width": 800,                       //  宽度

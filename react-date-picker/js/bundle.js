@@ -79,10 +79,6 @@
 
 	var _DatePicker2 = _interopRequireDefault(_DatePicker);
 
-	__webpack_require__(161);
-
-	__webpack_require__(165);
-
 	var App = (function (_Component) {
 	    _inherits(App, _Component);
 
@@ -95,7 +91,15 @@
 	    _createClass(App, [{
 	        key: "render",
 	        value: function render() {
-	            var config = {};
+	            var config = {
+	                "format": "YYYY-MM-dd HH:mm:ss",
+	                "initDate": "now",
+	                "showLevel": "day",
+	                "maxDate": "2100-01-01",
+	                "minDate": "2000-01-01",
+	                "change": function change() {},
+	                "close": function close() {}
+	            };
 	            return _react2["default"].createElement(
 	                "div",
 	                null,
@@ -19762,15 +19766,19 @@
 
 	var _Util2 = _interopRequireDefault(_Util);
 
+	__webpack_require__(161);
+
+	__webpack_require__(165);
+
 	//  默认配置
 	var defConfig = {
 	    "format": "YYYY-MM-dd HH:mm:ss", //  输出的时间格式
-	    "initDate": "now", //  初始化时间格式
+	    "initDate": "now", //  初始化时间(now||"":当前|时间字符串)
 	    "showLevel": "day", //  显示级别(day:日|month:月|year:年)
 	    "maxDate": "2100-01-01", //  最大日期
 	    "minDate": "2000-01-01", //  最小日期
-	    "change": function change() {}, //  选择的日期发生改变
-	    "close": function close() {} //  关闭
+	    "change": function change() {}, //  选择的日期发生改变回调
+	    "close": function close() {} //  关闭回调
 	};
 
 	//  月份天数
@@ -19822,12 +19830,15 @@
 	    _createClass(DatePicker, [{
 	        key: "componentWillMount",
 	        value: function componentWillMount() {
+	            var _this = this;
+
 	            var config = this.props.config;
 
 	            this.setState({
 	                "config": _Util2["default"].merge(defConfig, config || {})
+	            }, function () {
+	                _this.calculatorInfo();
 	            });
-	            this.calculatorInfo();
 	        }
 
 	        /**
@@ -19850,11 +19861,21 @@
 	    }, {
 	        key: "showToday",
 	        value: function showToday() {
+	            var _this2 = this;
+
 	            var config = this.props.config;
 
 	            this.setState({
 	                "current": this.state.storedDate,
 	                "config": (0, _objectAssign2["default"])({}, config, { "showLevel": "day" })
+	            }, function () {
+	                _Util2["default"].runCallback(config.change, {
+	                    "argus": {
+	                        "current": target,
+	                        "result": _Util2["default"].convertTime(target, config.format)
+	                    }
+	                });
+	                _this2.calculatorInfo();
 	            });
 	        }
 
@@ -19866,8 +19887,42 @@
 	    }, {
 	        key: "changeDate",
 	        value: function changeDate(date, type) {
-	            if (type == "prev-month") {} else if (type == "next-month") {} else {}
-	            this.calculatorInfo();
+	            var _this3 = this;
+
+	            var current = this.state.current;
+
+	            var year = current.year;
+	            var month = current.month;
+	            if (type == "prev-month") {
+	                month -= 1;
+	                if (month < 0) {
+	                    year -= 1;
+	                    month = 11;
+	                }
+	            } else if (type == "next-month") {
+	                month += 1;
+	                if (month > 11) {
+	                    year += 1;
+	                    month = 0;
+	                }
+	            }
+	            var target = new Date(year, month, date);
+	            this.setState({
+	                "current": (0, _objectAssign2["default"])({}, current, {
+	                    "month": target.getMonth(),
+	                    "year": target.getFullYear(),
+	                    "date": date
+	                }),
+	                "date": target
+	            }, function () {
+	                _Util2["default"].runCallback(config.change, {
+	                    "argus": {
+	                        "current": target,
+	                        "result": _Util2["default"].convertTime(target, config.format)
+	                    }
+	                });
+	                _this3.calculatorInfo();
+	            });
 	        }
 
 	        /**
@@ -19877,9 +19932,31 @@
 	    }, {
 	        key: "changeMonth",
 	        value: function changeMonth(month) {
-	            var current = this.state.current;
+	            var _this4 = this;
 
-	            this.calculatorInfo();
+	            var _state = this.state;
+	            var current = _state.current;
+	            var config = _state.config;
+
+	            var year = current.year;
+	            var target = new Date(year, month, 1);
+	            this.setState({
+	                "current": (0, _objectAssign2["default"])({}, current, {
+	                    "month": month,
+	                    "year": target.getFullYear(),
+	                    "date": 1
+	                }),
+	                "date": target,
+	                "config": (0, _objectAssign2["default"])({}, config, { "showLevel": "day" })
+	            }, function () {
+	                _Util2["default"].runCallback(config.change, {
+	                    "argus": {
+	                        "current": target,
+	                        "result": _Util2["default"].convertTime(target, config.format)
+	                    }
+	                });
+	                _this4.calculatorInfo();
+	            });
 	        }
 
 	        /**
@@ -19889,14 +19966,30 @@
 	    }, {
 	        key: "changeYear",
 	        value: function changeYear(year) {
-	            var _this = this;
+	            var _this5 = this;
 
-	            var current = this.state.current;
+	            var _state2 = this.state;
+	            var current = _state2.current;
+	            var config = _state2.config;
 
+	            var month = current.month;
+	            var target = new Date(year, month, 1);
 	            this.setState({
-	                "current": (0, _objectAssign2["default"])({}, current, { "year": year })
+	                "current": (0, _objectAssign2["default"])({}, current, {
+	                    "month": month,
+	                    "year": year,
+	                    "date": 1
+	                }),
+	                "date": target,
+	                "config": (0, _objectAssign2["default"])({}, config, { "showLevel": "month" })
 	            }, function () {
-	                _this.calculatorInfo();
+	                _Util2["default"].runCallback(config.change, {
+	                    "argus": {
+	                        "current": target,
+	                        "result": _Util2["default"].convertTime(target, config.format)
+	                    }
+	                });
+	                _this5.calculatorInfo();
 	            });
 	        }
 
@@ -19906,7 +19999,7 @@
 	    }, {
 	        key: "prevMonth",
 	        value: function prevMonth() {
-	            var _this2 = this;
+	            var _this6 = this;
 
 	            var current = this.state.current;
 
@@ -19917,15 +20010,20 @@
 	                year -= 1;
 	            }
 	            var target = new Date(year, month, 1);
-	            current = (0, _objectAssign2["default"])({}, current, {
-	                "month": target.getMonth(),
-	                "year": target.getFullYear()
-	            });
 	            this.setState({
-	                "current": current,
+	                "current": (0, _objectAssign2["default"])({}, current, {
+	                    "month": target.getMonth(),
+	                    "year": target.getFullYear()
+	                }),
 	                "date": target
 	            }, function () {
-	                _this2.calculatorInfo();
+	                _Util2["default"].runCallback(config.change, {
+	                    "argus": {
+	                        "current": target,
+	                        "result": _Util2["default"].convertTime(target, config.format)
+	                    }
+	                });
+	                _this6.calculatorInfo();
 	            });
 	        }
 
@@ -19935,9 +20033,11 @@
 	    }, {
 	        key: "nextMonth",
 	        value: function nextMonth() {
-	            var _this3 = this;
+	            var _this7 = this;
 
-	            var current = this.state.current;
+	            var _state3 = this.state;
+	            var current = _state3.current;
+	            var config = _state3.config;
 
 	            var month = current.month + 1;
 	            var year = current.year;
@@ -19946,15 +20046,20 @@
 	                year += 1;
 	            }
 	            var target = new Date(year, month, 1);
-	            current = (0, _objectAssign2["default"])({}, current, {
-	                "month": target.getMonth(),
-	                "year": target.getFullYear()
-	            });
 	            this.setState({
-	                "current": current,
+	                "current": (0, _objectAssign2["default"])({}, current, {
+	                    "month": target.getMonth(),
+	                    "year": target.getFullYear()
+	                }),
 	                "date": target
 	            }, function () {
-	                _this3.calculatorInfo();
+	                _Util2["default"].runCallback(config.change, {
+	                    "argus": {
+	                        "current": target,
+	                        "result": _Util2["default"].convertTime(target, config.format)
+	                    }
+	                });
+	                _this7.calculatorInfo();
 	            });
 	        }
 
@@ -19964,11 +20069,11 @@
 	    }, {
 	        key: "prevYear",
 	        value: function prevYear() {
-	            var _this4 = this;
+	            var _this8 = this;
 
-	            var _state = this.state;
-	            var current = _state.current;
-	            var config = _state.config;
+	            var _state4 = this.state;
+	            var current = _state4.current;
+	            var config = _state4.config;
 
 	            var year = current.year - 1;
 	            var target = new Date(year, current.month, 1);
@@ -19980,7 +20085,13 @@
 	                "current": (0, _objectAssign2["default"])({}, current, { "year": year }),
 	                "date": new Date(year, current.month, 1)
 	            }, function () {
-	                _this4.calculatorInfo();
+	                _Util2["default"].runCallback(config.change, {
+	                    "argus": {
+	                        "current": target,
+	                        "result": _Util2["default"].convertTime(target, config.format)
+	                    }
+	                });
+	                _this8.calculatorInfo();
 	            });
 	        }
 
@@ -19990,11 +20101,11 @@
 	    }, {
 	        key: "nextYear",
 	        value: function nextYear() {
-	            var _this5 = this;
+	            var _this9 = this;
 
-	            var _state2 = this.state;
-	            var current = _state2.current;
-	            var config = _state2.config;
+	            var _state5 = this.state;
+	            var current = _state5.current;
+	            var config = _state5.config;
 
 	            var year = current.year + 1;
 	            var target = new Date(year, current.month, 1);
@@ -20006,7 +20117,13 @@
 	                "current": (0, _objectAssign2["default"])({}, current, { "year": year }),
 	                "date": target
 	            }, function () {
-	                _this5.calculatorInfo();
+	                _Util2["default"].runCallback(config.change, {
+	                    "argus": {
+	                        "current": target,
+	                        "result": _Util2["default"].convertTime(target, config.format)
+	                    }
+	                });
+	                _this9.calculatorInfo();
 	            });
 	        }
 
@@ -20016,11 +20133,12 @@
 	    }, {
 	        key: "calculatorInfo",
 	        value: function calculatorInfo() {
-	            var _state3 = this.state;
-	            var current = _state3.current;
-	            var storedDate = _state3.storedDate;
-	            var renderData = _state3.renderData;
-	            var config = _state3.config;
+	            var _state6 = this.state;
+	            var current = _state6.current;
+	            var storedDate = _state6.storedDate;
+	            var date = _state6.date;
+	            var renderData = _state6.renderData;
+	            var config = _state6.config;
 
 	            var getInfos = {
 	                "prevYear": current.year, //  上月对应的年
@@ -20028,6 +20146,11 @@
 	                "prevMonth": current.month - 1, //  上月对应的月
 	                "nextMonth": current.month + 1 //  下月对应的月
 	            };
+	            var activeObj = {
+	                "year": date.getFullYear(),
+	                "month": date.getMonth(),
+	                "date": date.getDate()
+	            }; //  判断active
 	            var curYear = current.year; //  当前年
 	            var minDate = new Date(config.minDate); //  最小日期
 	            var maxDate = new Date(config.maxDate); //  最大日期
@@ -20058,7 +20181,7 @@
 	                    "text": year,
 	                    "num": year,
 	                    "current": year == storedDate.year,
-	                    "active": false,
+	                    "active": year == activeObj.year,
 	                    "id": _Util2["default"].random()
 	                });
 	            }
@@ -20074,7 +20197,7 @@
 	                    "text": item,
 	                    "num": index,
 	                    "current": current.year == storedDate.year && index == storedDate.month,
-	                    "active": false,
+	                    "active": index == activeObj.month,
 	                    "id": _Util2["default"].random()
 	                };
 	            });
@@ -20122,7 +20245,7 @@
 	                renderDataDays.push({
 	                    "num": i,
 	                    "today": current.year == storedDate.year && current.month == storedDate.month && i == storedDate.date,
-	                    "active": false,
+	                    "active": current.year == date.year && current.month == date.month && i == date.date,
 	                    "id": _Util2["default"].random(),
 	                    "type": "current-month"
 	                });
@@ -20159,9 +20282,9 @@
 	    }, {
 	        key: "renderTop",
 	        value: function renderTop() {
-	            var _state4 = this.state;
-	            var config = _state4.config;
-	            var date = _state4.date;
+	            var _state7 = this.state;
+	            var config = _state7.config;
+	            var date = _state7.date;
 
 	            var targetDate = _Util2["default"].convertTime(date, "YYYY-MM-dd");
 	            return _react2["default"].createElement(
@@ -20268,17 +20391,17 @@
 	    }, {
 	        key: "renderYear",
 	        value: function renderYear() {
-	            var _this6 = this;
+	            var _this10 = this;
 
-	            var _state5 = this.state;
-	            var renderData = _state5.renderData;
-	            var config = _state5.config;
+	            var _state8 = this.state;
+	            var renderData = _state8.renderData;
+	            var config = _state8.config;
 
 	            var years = renderData.years.map(function (item) {
 	                return _react2["default"].createElement(
 	                    "span",
 	                    { key: item.id,
-	                        onClick: _this6.changeYear.bind(_this6, item.num),
+	                        onClick: _this10.changeYear.bind(_this10, item.num),
 	                        className: "year-item " + (0, _classnames2["default"])({
 	                            "current": item.current,
 	                            "active": item.active
@@ -20300,17 +20423,17 @@
 	    }, {
 	        key: "renderMonth",
 	        value: function renderMonth() {
-	            var _this7 = this;
+	            var _this11 = this;
 
-	            var _state6 = this.state;
-	            var renderData = _state6.renderData;
-	            var config = _state6.config;
+	            var _state9 = this.state;
+	            var renderData = _state9.renderData;
+	            var config = _state9.config;
 
 	            var months = renderData.months.map(function (item) {
 	                return _react2["default"].createElement(
 	                    "span",
 	                    { key: item.id,
-	                        onClick: _this7.changeMonth.bind(_this7, item.num),
+	                        onClick: _this11.changeMonth.bind(_this11, item.num),
 	                        className: "month-item " + (0, _classnames2["default"])({
 	                            "current": item.current,
 	                            "active": item.active
@@ -20332,14 +20455,18 @@
 	    }, {
 	        key: "renderDate",
 	        value: function renderDate() {
-	            var _state7 = this.state;
-	            var renderData = _state7.renderData;
-	            var config = _state7.config;
+	            var _this12 = this;
+
+	            var _state10 = this.state;
+	            var renderData = _state10.renderData;
+	            var config = _state10.config;
 
 	            var days = renderData.days.map(function (item) {
 	                return _react2["default"].createElement(
 	                    "span",
-	                    { key: item.id, className: "day-item " + item.type + " " + (0, _classnames2["default"])({
+	                    { key: item.id,
+	                        onClick: _this12.changeDate.bind(_this12, item.num, item.type),
+	                        className: "day-item " + item.type + " " + (0, _classnames2["default"])({
 	                            "today": item.today,
 	                            "active": item.active
 	                        }) },
@@ -20378,7 +20505,9 @@
 	         */
 	    }, {
 	        key: "componentWillUnmount",
-	        value: function componentWillUnmount() {}
+	        value: function componentWillUnmount() {
+	            this.state = {};
+	        }
 	    }]);
 
 	    return DatePicker;
@@ -20742,7 +20871,7 @@
 
 
 	// module
-	exports.push([module.id, ".date-picker-all {\n  width: 290px;\n  background: #fff;\n  border-radius: 10px;\n  border: 1px solid #ccc;\n}\n.btn-area {\n  width: 100%;\n  overflow: hidden;\n  line-height: 30px;\n  text-align: center;\n}\n.btn-area > div {\n  float: left;\n}\n.btn-area .left-btns,\n.btn-area .right-btns {\n  width: 70px;\n  text-align: center;\n}\n.btn-area .left-btns i,\n.btn-area .right-btns i {\n  display: inline-block;\n  float: left;\n  width: 25px;\n  height: 25px;\n  cursor: default;\n  line-height: 25px;\n  text-align: center;\n  border: 1px solid #ccc;\n  border-radius: 5px;\n  margin: 3px;\n}\n.btn-area .center-info {\n  width: 150px;\n  font-size: 16px;\n  cursor: default;\n}\n.weeks {\n  padding: 0 5px;\n}\n.weeks .week-num {\n  display: inline-block;\n  width: 40px;\n  font-size: 12px;\n  text-align: center;\n}\n.days-container {\n  padding: 5px;\n}\n.months-container {\n  padding: 5px 10px;\n}\n.years-container {\n  padding: 5px 10px;\n}\n.years-container .year-item {\n  display: inline-block;\n  width: 52px;\n  height: 40px;\n  text-align: center;\n  line-height: 40px;\n  color: #000;\n  transition: all 0.5s;\n  cursor: default;\n  border-radius: 5px;\n  margin: 1px;\n}\n.months-container .month-item {\n  display: inline-block;\n  width: 62px;\n  height: 40px;\n  text-align: center;\n  line-height: 40px;\n  color: #000;\n  transition: all 0.5s;\n  cursor: default;\n  border-radius: 5px;\n  margin: 1px;\n}\n.days-container .day-item {\n  display: inline-block;\n  width: 38px;\n  height: 30px;\n  text-align: center;\n  line-height: 30px;\n  color: #000;\n  transition: all 0.5s;\n  cursor: default;\n  border-radius: 5px;\n  margin: 1px;\n}\n.years-container .year-item:hover,\n.years-container .year-item.active,\n.days-container .day-item:hover,\n.days-container .day-item.active {\n  background: #555;\n  color: #fff;\n}\n.prev-month,\n.next-month {\n  background: #f2f2f2;\n}\n", ""]);
+	exports.push([module.id, ".date-picker-all {\n  width: 290px;\n  background: #fff;\n  border-radius: 10px;\n  border: 1px solid #ccc;\n}\n.btn-area {\n  width: 100%;\n  overflow: hidden;\n  line-height: 30px;\n  text-align: center;\n}\n.btn-area > div {\n  float: left;\n}\n.btn-area .left-btns,\n.btn-area .right-btns {\n  width: 70px;\n  text-align: center;\n}\n.btn-area .left-btns i,\n.btn-area .right-btns i {\n  display: inline-block;\n  float: left;\n  width: 25px;\n  height: 25px;\n  cursor: default;\n  line-height: 25px;\n  text-align: center;\n  border: 1px solid #ccc;\n  border-radius: 5px;\n  margin: 3px;\n}\n.btn-area .center-info {\n  width: 150px;\n  font-size: 16px;\n  cursor: default;\n}\n.weeks {\n  padding: 0 5px;\n}\n.weeks .week-num {\n  display: inline-block;\n  width: 40px;\n  font-size: 12px;\n  text-align: center;\n}\n.days-container {\n  padding: 5px;\n}\n.months-container {\n  padding: 5px 10px;\n}\n.years-container {\n  padding: 5px 10px;\n}\n.years-container .year-item {\n  display: inline-block;\n  width: 52px;\n  height: 40px;\n  text-align: center;\n  line-height: 40px;\n  color: #000;\n  transition: all 0.5s;\n  cursor: default;\n  border-radius: 5px;\n  margin: 1px;\n}\n.months-container .month-item {\n  display: inline-block;\n  width: 62px;\n  height: 40px;\n  text-align: center;\n  line-height: 40px;\n  color: #000;\n  transition: all 0.5s;\n  cursor: default;\n  border-radius: 5px;\n  margin: 1px;\n}\n.days-container .day-item {\n  display: inline-block;\n  width: 38px;\n  height: 30px;\n  text-align: center;\n  line-height: 30px;\n  color: #000;\n  transition: all 0.5s;\n  cursor: default;\n  border-radius: 5px;\n  margin: 1px;\n}\n.years-container .year-item:hover,\n.years-container .year-item.active,\n.months-container .month-item:hover,\n.months-container .month-item.active,\n.days-container .day-item:hover,\n.days-container .day-item.active {\n  background: #555;\n  color: #fff;\n}\n.prev-month,\n.next-month {\n  background: #f2f2f2;\n}\n.days-container .today {\n  background: #555;\n  color: #fff;\n}\n.active {\n  background: #BDA5A5;\n  color: #fff;\n}\n.days-container .today,\n.months-container .current,\n.years-container .current {\n  background: #555;\n  color: #fff;\n}\n", ""]);
 
 	// exports
 
