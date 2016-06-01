@@ -79,9 +79,9 @@
 
 	var _DatePicker2 = _interopRequireDefault(_DatePicker);
 
-	__webpack_require__(170);
+	__webpack_require__(164);
 
-	__webpack_require__(167);
+	__webpack_require__(168);
 
 	var App = (function (_Component) {
 	    _inherits(App, _Component);
@@ -19750,15 +19750,15 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(172);
+	var _classnames = __webpack_require__(161);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _objectAssign = __webpack_require__(174);
+	var _objectAssign = __webpack_require__(162);
 
 	var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-	var _Util = __webpack_require__(161);
+	var _Util = __webpack_require__(163);
 
 	var _Util2 = _interopRequireDefault(_Util);
 
@@ -19905,10 +19905,20 @@
 	        value: function prevMonth() {
 	            var current = this.state.current;
 
-	            var month = current.month - 1 < 0 ? 11 : current.month - 1;
+	            var month = current.month - 1;
+	            var year = current.year;
+	            if (month < 0) {
+	                month = 11;
+	                year -= 1;
+	            }
+	            var target = new Date(year, month, 1);
+	            current = (0, _objectAssign2["default"])({}, current, {
+	                "month": target.getMonth(),
+	                "year": target.getFullYear()
+	            });
 	            this.setState({
-	                "current": (0, _objectAssign2["default"])({}, current, { "month": month }),
-	                "date": new Date(current.year, month, current.date)
+	                "current": current,
+	                "date": target
 	            });
 	            this.calculatorInfo();
 	        }
@@ -19921,10 +19931,20 @@
 	        value: function nextMonth() {
 	            var current = this.state.current;
 
-	            var month = current.month + 1 > 11 ? 0 : current.month - 0;
+	            var month = current.month + 1;
+	            var year = current.year;
+	            if (month > 11) {
+	                month = 0;
+	                year += 1;
+	            }
+	            var target = new Date(year, month, 1);
+	            current = (0, _objectAssign2["default"])({}, current, {
+	                "month": target.getMonth(),
+	                "year": target.getFullYear()
+	            });
 	            this.setState({
-	                "current": (0, _objectAssign2["default"])({}, current, { "month": month }),
-	                "date": new Date(current.year, month, current.date)
+	                "current": current,
+	                "date": target
 	            });
 	            this.calculatorInfo();
 	        }
@@ -19935,12 +19955,19 @@
 	    }, {
 	        key: "prevYear",
 	        value: function prevYear() {
-	            var current = this.state.current;
+	            var _state = this.state;
+	            var current = _state.current;
+	            var config = _state.config;
 
 	            var year = current.year - 1;
+	            var target = new Date(year, current.month, 1);
+	            //  超过临界
+	            if (target < new Date(config.minDate)) {
+	                return;
+	            }
 	            this.setState({
 	                "current": (0, _objectAssign2["default"])({}, current, { "year": year }),
-	                "date": new Date(year, current.month, current.date)
+	                "date": new Date(year, current.month, 1)
 	            });
 	            this.calculatorInfo();
 	        }
@@ -19951,12 +19978,19 @@
 	    }, {
 	        key: "nextYear",
 	        value: function nextYear() {
-	            var current = this.state.current;
+	            var _state2 = this.state;
+	            var current = _state2.current;
+	            var config = _state2.config;
 
 	            var year = current.year + 1;
+	            var target = new Date(year, current.month, 1);
+	            //  超过临界
+	            if (target > new Date(config.maxDate)) {
+	                return;
+	            }
 	            this.setState({
 	                "current": (0, _objectAssign2["default"])({}, current, { "year": year }),
-	                "date": new Date(year, current.month, current.date)
+	                "date": target
 	            });
 	            this.calculatorInfo();
 	        }
@@ -19967,11 +20001,11 @@
 	    }, {
 	        key: "calculatorInfo",
 	        value: function calculatorInfo() {
-	            var _state = this.state;
-	            var current = _state.current;
-	            var storedDate = _state.storedDate;
-	            var renderData = _state.renderData;
-	            var config = _state.config;
+	            var _state3 = this.state;
+	            var current = _state3.current;
+	            var storedDate = _state3.storedDate;
+	            var renderData = _state3.renderData;
+	            var config = _state3.config;
 
 	            var getInfos = {
 	                "prevYear": current.year, //  上月对应的年
@@ -20110,11 +20144,10 @@
 	    }, {
 	        key: "renderTop",
 	        value: function renderTop() {
-	            var _state2 = this.state;
-	            var config = _state2.config;
-	            var date = _state2.date;
+	            var _state4 = this.state;
+	            var config = _state4.config;
+	            var date = _state4.date;
 
-	            console.log(date);
 	            var targetDate = _Util2["default"].convertTime(date, "YYYY-MM-dd");
 	            return _react2["default"].createElement(
 	                "div",
@@ -20222,9 +20255,9 @@
 	        value: function renderYear() {
 	            var _this = this;
 
-	            var _state3 = this.state;
-	            var renderData = _state3.renderData;
-	            var config = _state3.config;
+	            var _state5 = this.state;
+	            var renderData = _state5.renderData;
+	            var config = _state5.config;
 
 	            var years = renderData.years.map(function (item) {
 	                return _react2["default"].createElement(
@@ -20254,9 +20287,9 @@
 	        value: function renderMonth() {
 	            var _this2 = this;
 
-	            var _state4 = this.state;
-	            var renderData = _state4.renderData;
-	            var config = _state4.config;
+	            var _state6 = this.state;
+	            var renderData = _state6.renderData;
+	            var config = _state6.config;
 
 	            var months = renderData.months.map(function (item) {
 	                return _react2["default"].createElement(
@@ -20284,9 +20317,9 @@
 	    }, {
 	        key: "renderDate",
 	        value: function renderDate() {
-	            var _state5 = this.state;
-	            var renderData = _state5.renderData;
-	            var config = _state5.config;
+	            var _state7 = this.state;
+	            var renderData = _state7.renderData;
+	            var config = _state7.config;
 
 	            var days = renderData.days.map(function (item) {
 	                return _react2["default"].createElement(
@@ -20341,6 +20374,148 @@
 
 /***/ },
 /* 161 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	  Copyright (c) 2016 Jed Watson.
+	  Licensed under the MIT License (MIT), see
+	  http://jedwatson.github.io/classnames
+	*/
+	/* global define */
+
+	'use strict';
+
+	(function () {
+		'use strict';
+
+		var hasOwn = ({}).hasOwnProperty;
+
+		function classNames() {
+			var classes = [];
+
+			for (var i = 0; i < arguments.length; i++) {
+				var arg = arguments[i];
+				if (!arg) continue;
+
+				var argType = typeof arg;
+
+				if (argType === 'string' || argType === 'number') {
+					classes.push(arg);
+				} else if (Array.isArray(arg)) {
+					classes.push(classNames.apply(null, arg));
+				} else if (argType === 'object') {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes.push(key);
+						}
+					}
+				}
+			}
+
+			return classes.join(' ');
+		}
+
+		if (typeof module !== 'undefined' && module.exports) {
+			module.exports = classNames;
+		} else if (true) {
+			// register as 'classnames', consistent with npm package name
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+				return classNames;
+			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+		} else {
+			window.classNames = classNames;
+		}
+	})();
+
+/***/ },
+/* 162 */
+/***/ function(module, exports) {
+
+	'use strict';
+	/* eslint-disable no-unused-vars */
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
+	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+	function toObject(val) {
+		if (val === null || val === undefined) {
+			throw new TypeError('Object.assign cannot be called with null or undefined');
+		}
+
+		return Object(val);
+	}
+
+	function shouldUseNative() {
+		try {
+			if (!Object.assign) {
+				return false;
+			}
+
+			// Detect buggy property enumeration order in older V8 versions.
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+			var test1 = new String('abc'); // eslint-disable-line
+			test1[5] = 'de';
+			if (Object.getOwnPropertyNames(test1)[0] === '5') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test2 = {};
+			for (var i = 0; i < 10; i++) {
+				test2['_' + String.fromCharCode(i)] = i;
+			}
+			var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+				return test2[n];
+			});
+			if (order2.join('') !== '0123456789') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test3 = {};
+			'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+				test3[letter] = letter;
+			});
+			if (Object.keys(Object.assign({}, test3)).join('') !== 'abcdefghijklmnopqrst') {
+				return false;
+			}
+
+			return true;
+		} catch (e) {
+			// We don't expect any of the above to throw, but better to be safe.
+			return false;
+		}
+	}
+
+	module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+		var from;
+		var to = toObject(target);
+		var symbols;
+
+		for (var s = 1; s < arguments.length; s++) {
+			from = Object(arguments[s]);
+
+			for (var key in from) {
+				if (hasOwnProperty.call(from, key)) {
+					to[key] = from[key];
+				}
+			}
+
+			if (Object.getOwnPropertySymbols) {
+				symbols = Object.getOwnPropertySymbols(from);
+				for (var i = 0; i < symbols.length; i++) {
+					if (propIsEnumerable.call(from, symbols[i])) {
+						to[symbols[i]] = from[symbols[i]];
+					}
+				}
+			}
+		}
+
+		return to;
+	};
+
+/***/ },
+/* 163 */
 /***/ function(module, exports) {
 
 	/**
@@ -20449,7 +20624,7 @@
 	        key: "getMonthFristDay",
 	        value: function getMonthFristDay(year, month, day) {
 	            if (year && month) {
-	                return new Date(year, month, 1).getDay();
+	                return new Date(year, month, day || 1).getDay();
 	            } else {
 	                var dateObject = new Date();
 	                return new Date(dateObject.getFullYear(), date.getMonth(), day || 1).getDay();
@@ -20580,9 +20755,102 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 162 */,
-/* 163 */,
 /* 164 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(165);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(167)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../node_modules/css-loader/index.js!./../node_modules/less-loader/index.js!./reset.less", function() {
+				var newContent = require("!!./../node_modules/css-loader/index.js!./../node_modules/less-loader/index.js!./reset.less");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 165 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(166)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "html,\nbody {\n  border: 0;\n  font-family: \"Helvetica-Neue\", \"Helvetica\", Arial, sans-serif;\n  line-height: 1.5;\n  margin: 0;\n  padding: 0;\n}\ndiv,\nspan,\nobject,\niframe,\nimg,\ntable,\ncaption,\nthead,\ntbody,\ntfoot,\ntr,\ntr,\ntd,\narticle,\naside,\ncanvas,\ndetails,\nfigure,\nhgroup,\nmenu,\nnav,\nfooter,\nheader,\nsection,\nsummary,\nmark,\naudio,\nvideo {\n  border: 0;\n  margin: 0;\n  padding: 0;\n}\nh1,\nh2,\nh3,\nh4,\nh5,\nh6,\np,\nblockquote,\npre,\na,\nabbr,\naddress,\ncit,\ncode,\ndel,\ndfn,\nem,\nins,\nq,\nsamp,\nsmall,\nstrong,\nsub,\nsup,\nb,\ni,\nhr,\ndl,\ndt,\ndd,\nol,\nul,\nli,\nfieldset,\nlegend,\nlabel {\n  border: 0;\n  font-size: 100%;\n  vertical-align: baseline;\n  margin: 0;\n  padding: 0;\n}\narticle,\naside,\ncanvas,\nfigure,\nfigure img,\nfigcaption,\nhgroup,\nfooter,\nheader,\nnav,\nsection,\naudio,\nvideo {\n  display: block;\n}\ntable {\n  border-collapse: separate;\n  border-spacing: 0;\n}\ntable caption,\ntable th,\ntable td {\n  text-align: left;\n  vertical-align: middle;\n}\na img {\n  border: 0;\n}\n:focus {\n  outline: 0;\n}\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 166 */
+/***/ function(module, exports) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	"use strict";
+
+	module.exports = function () {
+		var list = [];
+
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for (var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if (item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
+
+		// import a list of modules into the list
+		list.i = function (modules, mediaQuery) {
+			if (typeof modules === "string") modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for (var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if (typeof id === "number") alreadyImportedModules[id] = true;
+			}
+			for (i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if (typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if (mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if (mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
+
+/***/ },
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -20807,18 +21075,16 @@
 
 
 /***/ },
-/* 165 */,
-/* 166 */,
-/* 167 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(168);
+	var content = __webpack_require__(169);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(164)(content, {});
+	var update = __webpack_require__(167)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -20835,10 +21101,10 @@
 	}
 
 /***/ },
-/* 168 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(169)();
+	exports = module.exports = __webpack_require__(166)();
 	// imports
 
 
@@ -20847,244 +21113,6 @@
 
 	// exports
 
-
-/***/ },
-/* 169 */
-/***/ function(module, exports) {
-
-	/*
-		MIT License http://www.opensource.org/licenses/mit-license.php
-		Author Tobias Koppers @sokra
-	*/
-	// css base code, injected by the css-loader
-	"use strict";
-
-	module.exports = function () {
-		var list = [];
-
-		// return the list of modules as css string
-		list.toString = function toString() {
-			var result = [];
-			for (var i = 0; i < this.length; i++) {
-				var item = this[i];
-				if (item[2]) {
-					result.push("@media " + item[2] + "{" + item[1] + "}");
-				} else {
-					result.push(item[1]);
-				}
-			}
-			return result.join("");
-		};
-
-		// import a list of modules into the list
-		list.i = function (modules, mediaQuery) {
-			if (typeof modules === "string") modules = [[null, modules, ""]];
-			var alreadyImportedModules = {};
-			for (var i = 0; i < this.length; i++) {
-				var id = this[i][0];
-				if (typeof id === "number") alreadyImportedModules[id] = true;
-			}
-			for (i = 0; i < modules.length; i++) {
-				var item = modules[i];
-				// skip already imported module
-				// this implementation is not 100% perfect for weird media query combinations
-				//  when a module is imported multiple times with different media queries.
-				//  I hope this will never occur (Hey this way we have smaller bundles)
-				if (typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-					if (mediaQuery && !item[2]) {
-						item[2] = mediaQuery;
-					} else if (mediaQuery) {
-						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-					}
-					list.push(item);
-				}
-			}
-		};
-		return list;
-	};
-
-/***/ },
-/* 170 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(171);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(164)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../node_modules/css-loader/index.js!./../node_modules/less-loader/index.js!./reset.less", function() {
-				var newContent = require("!!./../node_modules/css-loader/index.js!./../node_modules/less-loader/index.js!./reset.less");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 171 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(169)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "html,\nbody {\n  border: 0;\n  font-family: \"Helvetica-Neue\", \"Helvetica\", Arial, sans-serif;\n  line-height: 1.5;\n  margin: 0;\n  padding: 0;\n}\ndiv,\nspan,\nobject,\niframe,\nimg,\ntable,\ncaption,\nthead,\ntbody,\ntfoot,\ntr,\ntr,\ntd,\narticle,\naside,\ncanvas,\ndetails,\nfigure,\nhgroup,\nmenu,\nnav,\nfooter,\nheader,\nsection,\nsummary,\nmark,\naudio,\nvideo {\n  border: 0;\n  margin: 0;\n  padding: 0;\n}\nh1,\nh2,\nh3,\nh4,\nh5,\nh6,\np,\nblockquote,\npre,\na,\nabbr,\naddress,\ncit,\ncode,\ndel,\ndfn,\nem,\nins,\nq,\nsamp,\nsmall,\nstrong,\nsub,\nsup,\nb,\ni,\nhr,\ndl,\ndt,\ndd,\nol,\nul,\nli,\nfieldset,\nlegend,\nlabel {\n  border: 0;\n  font-size: 100%;\n  vertical-align: baseline;\n  margin: 0;\n  padding: 0;\n}\narticle,\naside,\ncanvas,\nfigure,\nfigure img,\nfigcaption,\nhgroup,\nfooter,\nheader,\nnav,\nsection,\naudio,\nvideo {\n  display: block;\n}\ntable {\n  border-collapse: separate;\n  border-spacing: 0;\n}\ntable caption,\ntable th,\ntable td {\n  text-align: left;\n  vertical-align: middle;\n}\na img {\n  border: 0;\n}\n:focus {\n  outline: 0;\n}\n", ""]);
-
-	// exports
-
-
-/***/ },
-/* 172 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	  Copyright (c) 2016 Jed Watson.
-	  Licensed under the MIT License (MIT), see
-	  http://jedwatson.github.io/classnames
-	*/
-	/* global define */
-
-	'use strict';
-
-	(function () {
-		'use strict';
-
-		var hasOwn = ({}).hasOwnProperty;
-
-		function classNames() {
-			var classes = [];
-
-			for (var i = 0; i < arguments.length; i++) {
-				var arg = arguments[i];
-				if (!arg) continue;
-
-				var argType = typeof arg;
-
-				if (argType === 'string' || argType === 'number') {
-					classes.push(arg);
-				} else if (Array.isArray(arg)) {
-					classes.push(classNames.apply(null, arg));
-				} else if (argType === 'object') {
-					for (var key in arg) {
-						if (hasOwn.call(arg, key) && arg[key]) {
-							classes.push(key);
-						}
-					}
-				}
-			}
-
-			return classes.join(' ');
-		}
-
-		if (typeof module !== 'undefined' && module.exports) {
-			module.exports = classNames;
-		} else if (true) {
-			// register as 'classnames', consistent with npm package name
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-				return classNames;
-			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-		} else {
-			window.classNames = classNames;
-		}
-	})();
-
-/***/ },
-/* 173 */,
-/* 174 */
-/***/ function(module, exports) {
-
-	'use strict';
-	/* eslint-disable no-unused-vars */
-	var hasOwnProperty = Object.prototype.hasOwnProperty;
-	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-
-	function toObject(val) {
-		if (val === null || val === undefined) {
-			throw new TypeError('Object.assign cannot be called with null or undefined');
-		}
-
-		return Object(val);
-	}
-
-	function shouldUseNative() {
-		try {
-			if (!Object.assign) {
-				return false;
-			}
-
-			// Detect buggy property enumeration order in older V8 versions.
-
-			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-			var test1 = new String('abc'); // eslint-disable-line
-			test1[5] = 'de';
-			if (Object.getOwnPropertyNames(test1)[0] === '5') {
-				return false;
-			}
-
-			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-			var test2 = {};
-			for (var i = 0; i < 10; i++) {
-				test2['_' + String.fromCharCode(i)] = i;
-			}
-			var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
-				return test2[n];
-			});
-			if (order2.join('') !== '0123456789') {
-				return false;
-			}
-
-			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-			var test3 = {};
-			'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
-				test3[letter] = letter;
-			});
-			if (Object.keys(Object.assign({}, test3)).join('') !== 'abcdefghijklmnopqrst') {
-				return false;
-			}
-
-			return true;
-		} catch (e) {
-			// We don't expect any of the above to throw, but better to be safe.
-			return false;
-		}
-	}
-
-	module.exports = shouldUseNative() ? Object.assign : function (target, source) {
-		var from;
-		var to = toObject(target);
-		var symbols;
-
-		for (var s = 1; s < arguments.length; s++) {
-			from = Object(arguments[s]);
-
-			for (var key in from) {
-				if (hasOwnProperty.call(from, key)) {
-					to[key] = from[key];
-				}
-			}
-
-			if (Object.getOwnPropertySymbols) {
-				symbols = Object.getOwnPropertySymbols(from);
-				for (var i = 0; i < symbols.length; i++) {
-					if (propIsEnumerable.call(from, symbols[i])) {
-						to[symbols[i]] = from[symbols[i]];
-					}
-				}
-			}
-		}
-
-		return to;
-	};
 
 /***/ }
 /******/ ]);

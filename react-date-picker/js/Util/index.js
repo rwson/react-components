@@ -75,7 +75,7 @@ export default class Util {
      */
     static getMonthFristDay(year, month, day) {
         if (year && month) {
-            return (new Date(year, month, 1)).getDay();
+            return (new Date(year, month, day || 1)).getDay();
         } else {
             const dateObject = new Date();
             return (new Date(dateObject.getFullYear(), date.getMonth(), day || 1)).getDay();

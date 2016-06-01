@@ -135,11 +135,21 @@ export default class DatePicker extends Component {
      * 上一月按钮
      */
     prevMonth() {
-        const { current } = this.state;
-        let month = current.month - 1 < 0 ? 11 : current.month - 1;
+        let { current } = this.state;
+        let month = current.month - 1;
+        let year = current.year;
+        if (month < 0) {
+            month = 11;
+            year -= 1;
+        }
+        let target = new Date(year, month, 1);
+        current = objectAssign({}, current, {
+            "month": target.getMonth(),
+            "year": target.getFullYear()
+        });
         this.setState({
-            "current": objectAssign({}, current, {"month": month}),
-            "date": new Date(current.year, month, current.date)
+            "current": current,
+            "date": target
         });
         this.calculatorInfo();
     }
@@ -148,11 +158,21 @@ export default class DatePicker extends Component {
      * 下一月按钮
      */
     nextMonth() {
-        const { current } = this.state;
-        let month = current.month + 1 > 11 ? 0 : current.month - 0;
+        let { current } = this.state;
+        let month = current.month + 1;
+        let year = current.year;
+        if (month > 11) {
+            month = 0;
+            year += 1;
+        }
+        let target = new Date(year, month, 1);
+        current = objectAssign({}, current, {
+            "month": target.getMonth(),
+            "year": target.getFullYear()
+        });
         this.setState({
-            "current": objectAssign({}, current, {"month": month}),
-            "date": new Date(current.year, month, current.date)
+            "current": current,
+            "date": target
         });
         this.calculatorInfo();
     }
@@ -161,11 +181,16 @@ export default class DatePicker extends Component {
      * 上一年按钮
      */
     prevYear() {
-        const { current } = this.state;
+        const { current, config } = this.state;
         let year = current.year - 1;
+        let target = new Date(year, current.month, 1);
+        //  超过临界
+        if (target < new Date(config.minDate)) {
+            return;
+        }
         this.setState({
             "current": objectAssign({}, current, {"year": year}),
-            "date": new Date(year, current.month, current.date)
+            "date": new Date(year, current.month, 1)
         });
         this.calculatorInfo();
     }
@@ -174,11 +199,16 @@ export default class DatePicker extends Component {
      * 下一年按钮
      */
     nextYear() {
-        const { current } = this.state;
+        const { current, config } = this.state;
         let year = current.year + 1;
+        let target = new Date(year, current.month, 1);
+        //  超过临界
+        if (target > new Date(config.maxDate)) {
+            return;
+        }
         this.setState({
             "current": objectAssign({}, current, {"year": year}),
-            "date": new Date(year, current.month, current.date)
+            "date": target
         });
         this.calculatorInfo();
     }
@@ -271,7 +301,6 @@ export default class DatePicker extends Component {
             "nextMonthDays": monthDays[getInfos.nextMonth]
         };
 
-
         //  上月不是最后一天星期六
         if (daysInfo.prev != 5) {
             for (let i = daysInfo.prevMonthDays - daysInfo.prev, prev = daysInfo.prevMonthDays; i <= prev; i++) {
@@ -325,7 +354,6 @@ export default class DatePicker extends Component {
      */
     renderTop() {
         const { config, date } = this.state;
-        console.log(date);
         const targetDate = Util.convertTime(date, "YYYY-MM-dd");
         return (
             <div className="top-area">
