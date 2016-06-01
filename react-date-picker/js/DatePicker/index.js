@@ -15,12 +15,12 @@ const defConfig = {
     "format": "YYYY-MM-dd HH:mm:ss",        //  输出的时间格式
     "initDate": "now",                      //  初始化时间格式
     "showLevel": "day",                     //  显示级别(day:日|month:月|year:年)
-    "maxDate": "2100-01-01",
-    "minDate": "2000-01-01",
+    "maxDate": "2100-01-01",                //  最大日期
+    "minDate": "2000-01-01",                //  最小日期
     "change": () => {
-    },
+    },                  //  选择的日期发生改变
     "close": () => {
-    }
+    }                    //  关闭
 };
 
 //  月份天数
@@ -101,11 +101,8 @@ export default class DatePicker extends Component {
      */
     changeDate(date, type) {
         if (type == "prev-month") {
-
         } else if (type == "next-month") {
-
         } else {
-
         }
         this.calculatorInfo();
     }
@@ -127,8 +124,9 @@ export default class DatePicker extends Component {
         const { current } = this.state;
         this.setState({
             "current": objectAssign({}, current, {"year": year})
+        }, () => {
+            this.calculatorInfo();
         });
-        this.calculatorInfo();
     }
 
     /**
@@ -150,8 +148,9 @@ export default class DatePicker extends Component {
         this.setState({
             "current": current,
             "date": target
+        }, () => {
+            this.calculatorInfo();
         });
-        this.calculatorInfo();
     }
 
     /**
@@ -173,8 +172,9 @@ export default class DatePicker extends Component {
         this.setState({
             "current": current,
             "date": target
+        }, () => {
+            this.calculatorInfo();
         });
-        this.calculatorInfo();
     }
 
     /**
@@ -191,8 +191,9 @@ export default class DatePicker extends Component {
         this.setState({
             "current": objectAssign({}, current, {"year": year}),
             "date": new Date(year, current.month, 1)
+        }, () => {
+            this.calculatorInfo();
         });
-        this.calculatorInfo();
     }
 
     /**
@@ -209,8 +210,9 @@ export default class DatePicker extends Component {
         this.setState({
             "current": objectAssign({}, current, {"year": year}),
             "date": target
+        }, () => {
+            this.calculatorInfo();
         });
-        this.calculatorInfo();
     }
 
     /**
@@ -302,7 +304,7 @@ export default class DatePicker extends Component {
         };
 
         //  上月不是最后一天星期六
-        if (daysInfo.prev != 5) {
+        if (daysInfo.prev != 6) {
             for (let i = daysInfo.prevMonthDays - daysInfo.prev, prev = daysInfo.prevMonthDays; i <= prev; i++) {
                 renderDataDays.push({
                     "num": i,
