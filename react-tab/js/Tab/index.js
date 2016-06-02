@@ -21,25 +21,39 @@ const defConfig = {
         },
         {
             "title": "title2",
-            "content": "content2",
-            "type": "content"
-        },
-        {
-            "title": "title2",
-            "content": "content2",
+            "content": [
+                "item1",
+                "item2",
+                "item3"
+            ],
             "type": "list"
         },
         {
-            "title": "title2",
-            "content": "content2",
+            "title": "title3",
+            "content": [
+                {
+                    "title": "google",
+                    "link": "https://www.google.com.hk"
+                },
+                {
+                    "title": "github",
+                    "link": "https://github.com"
+                },
+                {
+                    "title": "youtube",
+                    "link": "https://github.com"
+                }
+            ],
             "type": "list-link"
         }
     ],
-    "initIndex": 1,
+    "initIndex": 0,
     "triggerChange": "click",
     "beforeChange": () => {
+        alert("切换前....");
     },
     "afterChange": () => {
+        alert("切换后....");
     }
 };
 
@@ -53,7 +67,7 @@ export default class Tab extends Component {
         super(props);
         this.state = {
             "config": defConfig,
-            "currentShow": 1
+            "currentShow": 0
         };
     }
 
@@ -62,15 +76,11 @@ export default class Tab extends Component {
      */
     componentWillMount() {
         const { config } = this.props;
+        const mergedObject = Util.merge(defConfig, config);
         this.setState({
-            "config": Util.merge(defConfig, config)
+            "config": mergedObject,
+            "currentShow": mergedObject.initIndex
         });
-    }
-
-    /**
-     * 组件被实例化完成
-     */
-    componentDidMount() {
     }
 
     /**
@@ -78,8 +88,15 @@ export default class Tab extends Component {
      * @param index 索引
      */
     changeCurrent(index) {
+        const { config } = this.state;
+        Util.runCallback({
+            "callback": config.beforeChange
+        });
         this.setState({
-            "current": index
+            "currentShow": index
+        });
+        Util.runCallback({
+            "callback": config.afterChange
         });
     }
 
@@ -88,7 +105,7 @@ export default class Tab extends Component {
      * @returns {XML||null}
      */
     renderTabTitle() {
-        const { config, current } = this.state;
+        const { config, currentShow } = this.state;
         const { tabs } = config;
         if (Util.isEmpty(tabs)) {
             return null;
@@ -97,8 +114,9 @@ export default class Tab extends Component {
             return (
                 <li key={ Util.random() }
                     className={`tab-controller-item ${classnames({
-                    "active": (current == config.initIndex) || (current == index)
-                })}`}>
+                        "active": ((currentShow == config.initIndex) && (currentShow == index)) || (currentShow == index)
+                    })}`}
+                    onClick={ this.changeCurrent.bind(this, index) }>
                     { item.title }
                 </li>
             );
@@ -112,27 +130,94 @@ export default class Tab extends Component {
         );
     }
 
+    /**
+     * 根据当前项下type对应的值具体渲染一种类型
+     * @param item  当前项
+     */
     renderInner(item) {
+        let returnVal = null;
+        switch (item.type) {
+
+            //  简单内容
+            case "content":
+                returnVal = (
+                    <div className="tab-simple-content">
+                        { item.content }
+                    </div>
+                );
+                break;
+
+            //  简单列表
+            case "list":
+                returnVal = (
+                    <ul className="tab-simple-list">
+                        {
+                            item.content.map((contentI) => {
+                                return (
+                                    <li key={ Util.random() }
+                                        className="tab-simple-list-item">
+                                        { contentI }
+                                    </li>
+                                );
+                            })
+                        }
+                    </ul>
+                );
+                break;
+
+            //  列表项链接
+            case "list-link":
+                returnVal = (
+                    <ul className="tab-link-list">
+                        {
+                            item.content.map((contentI) => {
+                                return (
+                                    <li key={ Util.random() }
+                                        className="tab-link-item-item">
+                                        <a target="_blank"
+                                            href={ contentI.link }>
+                                            { contentI.title }
+                                        </a>
+                                    </li>
+                                );
+                            })
+                        }
+                    </ul>
+                );
+                break;
+
+            default :break;
+        }
+        return returnVal;
     }
 
+    /**
+     * 渲染tab下面的显示部分
+     * @returns {XML||null}
+     */
     renderTabContent() {
-        const { config } = this.state;
+        const { config, currentShow } = this.state;
         const { tabs } = config;
         if (Util.isEmpty(tabs)) {
             return null;
         }
         let contents = tabs.map((item, index) => {
             let displayStyle = {
-                "display": (current == config.initIndex) || (current == index) ? "block" : "none"
+                "display": ((currentShow == config.initIndex) && (currentShow == index)) || (currentShow == index) ? "block" : "none"
             };
             return (
                 <div key={ Util.random() }
                      className={`tab-content-item`}
                      style={ displayStyle }>
-
+                    { this.renderInner(item) }
                 </div>
             );
         });
+        return (
+            <div className="tab-contents">
+                { contents }
+            </div>
+        );
     }
 
     /**
@@ -142,7 +227,8 @@ export default class Tab extends Component {
     render() {
         return (
             <div className="tab-container">
-
+                { this.renderTabTitle() }
+                { this.renderTabContent() }
             </div>
         );
     }

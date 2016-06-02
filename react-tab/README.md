@@ -1,6 +1,6 @@
-# react-date-picker
+# react-tab
 
-react版日期选择组件
+react版tab
 
 ---
 
@@ -15,37 +15,70 @@ react版日期选择组件
 
 
     "use strict";
-    
+
     import React,{ Component } from "react";
     import ReactDOM from "react-dom";
-    
-    import DatePicker from "path/to/DatePicker";
-    
+
+    import Tab from "./Tab";
+
     class App extends Component {
-    
+
         constructor(props) {
             super(props);
         }
     
         render() {
             const config = {
-                "format": "YYYY-MM-dd HH:mm:ss",
-                "initDate": "now",
-                "showLevel": "day",
-                "maxDate": "2100-01-01",
-                "minDate": "2000-01-01",
-                "change": (date,res) => {
+                "tabs": [
+                    {
+                        "title": "title1",
+                        "content": "content1",
+                        "type": "content"
+                    },
+                    {
+                        "title": "title2",
+                        "content": [
+                            "item1",
+                            "item2",
+                            "item3"
+                        ],
+                        "type": "list"
+                    },
+                    {
+                        "title": "title3",
+                        "content": [
+                            {
+                                "title": "google",
+                                "link": "https://www.google.com.hk"
+                            },
+                            {
+                                "title": "github",
+                                "link": "https://github.com"
+                            },
+                            {
+                                "title": "youtube",
+                                "link": "https://github.com"
+                            }
+                        ],
+                        "type": "list-link"
+                    }
+                ],
+                "initIndex": 0,
+                "triggerChange": "click",
+                "beforeChange": () => {
+                    alert("切换前....");
                 },
-                "close": () => {
+                "afterChange": () => {
+                    alert("切换后....");
                 }
             };
             return (
                 <div>
-                    <DatePicker config={ config } />
+                    <Tab />
                 </div>
             );
         }
-    
+
     }
     
     const container = document.querySelector("#app");
@@ -58,10 +91,16 @@ react版日期选择组件
 
 属性名 | 意义 | 可选值
 ---|---|---
-format | 输出的日期格式 |  字符串
-initDate | 初始化显示时间 |  now/"2016-06-01"/new Date("2016-06-01")
-showLevel | 默认显示层级 |  day:日/month:月/year:年
-maxDate | 能选择的最大时间 |  "2026-06-01"/new Date("2026-06-01")
-minDate | 是否支持栏加载 |  "2006-06-01"/new Date("2006-06-01")
-change | 选择的日期发生变化的回调 | 函数
-close | 日期选择框关闭的回调 |  函数(还没实现)
+tabs | tab项 | [Object],有三种可选,详见下方备注
+initIndex | 初始化显示第几个 |  从0开始
+beforeChange | 切换前回调 |  函数
+afterChange | 切换后回调 |  函数
+
+
+注:
+可以指定类型来决定(type)改tab显示的内容
+
+1. content      ->  简单内容
+2. list         ->  简单列表(content需要传入字符串类型的数组)
+3. list-link    ->  列表链接(content需要传入对象类型的数组,每一项由title和link组成)
+

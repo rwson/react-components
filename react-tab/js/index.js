@@ -7,7 +7,7 @@
 import React,{ Component } from "react";
 import ReactDOM from "react-dom";
 
-import DatePicker from "./DatePicker";
+import Tab from "./Tab";
 
 class App extends Component {
 
@@ -17,19 +17,51 @@ class App extends Component {
 
     render() {
         const config = {
-            "format": "YYYY-MM-dd HH:mm:ss",
-            "initDate": "now",
-            "showLevel": "day",
-            "maxDate": "2100-01-01",
-            "minDate": "2000-01-01",
-            "change": () => {
+            "tabs": [
+                {
+                    "title": "title1",
+                    "content": "content1",
+                    "type": "content"
+                },
+                {
+                    "title": "title2",
+                    "content": [
+                        "item1",
+                        "item2",
+                        "item3"
+                    ],
+                    "type": "list"
+                },
+                {
+                    "title": "title3",
+                    "content": [
+                        {
+                            "title": "google",
+                            "link": "https://www.google.com.hk"
+                        },
+                        {
+                            "title": "github",
+                            "link": "https://github.com"
+                        },
+                        {
+                            "title": "youtube",
+                            "link": "https://github.com"
+                        }
+                    ],
+                    "type": "list-link"
+                }
+            ],
+            "initIndex": 0,
+            "beforeChange": () => {
+                alert("切换前....");
             },
-            "close": () => {
+            "afterChange": () => {
+                alert("切换后....");
             }
         };
         return (
             <div>
-                <DatePicker config={ config } />
+                <Tab />
             </div>
         );
     }
